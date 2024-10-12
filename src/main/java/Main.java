@@ -22,10 +22,11 @@ public class Main {
           // Wait for connection from client.
           while (!serverSocket.isClosed()) {
               clientSocket = serverSocket.accept();
+              // handle multiple commands from redis client
               while (true) {
                   BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                  String str = reader.readLine();
-                  if (str == null) {
+                  String ans = getCommand(reader);
+                  if (ans.isBlank()) {
                       break;
                   }
                   clientSocket.getOutputStream().write("+PONG\r\n".getBytes(StandardCharsets.UTF_8));
@@ -42,5 +43,15 @@ public class Main {
             System.out.println("IOException: " + e.getMessage());
           }
         }
+  }
+
+  private static String getCommand(BufferedReader reader) throws IOException {
+      StringBuilder builder = new StringBuilder();
+      while (reader.ready()) {
+          builder
+                  .append(reader.readLine())
+                  .append("\r\n");
+      }
+      return builder.toString();
   }
 }
