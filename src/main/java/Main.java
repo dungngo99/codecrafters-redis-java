@@ -45,13 +45,12 @@ public class Main {
       try {
           // handle multiple commands from redis client
           while (true) {
-              BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-              String ans = getCommand(reader);
+              RedisInputStream redisInputStream = new RedisInputStream(clientSocket.getInputStream(), 1000);
+              String ans = Parser.process(redisInputStream);
               OutputStream outputStream = clientSocket.getOutputStream();
               try {
                   if (!ans.isBlank()) {
-                      System.out.println("command: " + ans);
-                      outputStream.write("+PONG\r\n".getBytes(StandardCharsets.UTF_8));
+                      outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
                       outputStream.flush();
                   }
               } catch (IOException e) {
