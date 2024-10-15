@@ -1,5 +1,5 @@
 package enums;
 
 public enum Command {
-    PING, ECHO, GET, SET;
+    PING, ECHO, GET, SET, PX;
 }

@@ -2,6 +2,7 @@ package handler.impl;
 
 import constants.OutputConstants;
 import constants.ParserConstants;
+import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
 import service.LocalMap;
@@ -27,7 +28,8 @@ public class GetHandler implements CommandHandler {
             joiner
                     .add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
         } else {
-            String value = (String) LocalMap.LOCAL_MAP.get(key);
+            Cache cache = LocalMap.LOCAL_MAP.get(key);
+            String value = cache.getValue();
             joiner
                     .add(OutputConstants.DOLLAR_SIZE + value.length())
                     .add(value);

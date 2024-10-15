@@ -1,9 +1,11 @@
+import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
 import handler.impl.EchoHandler;
 import handler.impl.GetHandler;
 import handler.impl.PingHandler;
 import handler.impl.SetHandler;
+import service.LocalMap;
 import service.Parser;
 import stream.RedisInputStream;
 
@@ -14,7 +16,10 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -33,6 +38,42 @@ public class Main {
         new GetHandler().register();
     }
 
+    private void initCleanLocalMap() {
+        new Thread(this::removeExpiredKeyFromLocalMap).start();
+    }
+
+    private void removeExpiredKeyFromLocalMap() {
+        try {
+            while (this.serverSocket != null && !this.serverSocket.isClosed()) {
+                Long currentTime = System.currentTimeMillis();
+                List<String> cacheKey2Remove = getCacheKey2Remove(currentTime);
+                for (String key: cacheKey2Remove) {
+                    LocalMap.LOCAL_MAP.remove(key);
+                }
+                Thread.sleep(10);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<String> getCacheKey2Remove(Long currentTime) {
+        List<String> cacheKey2Remove = new ArrayList<>();
+        for(Map.Entry<String, Cache> cacheEntry: LocalMap.LOCAL_MAP.entrySet()) {
+            String key = cacheEntry.getKey();
+            Cache cache = cacheEntry.getValue();
+            Long px = cache.getPx();
+            Long startTime = cache.getStartTime();
+            if (px == null || startTime == null) {
+                continue;
+            }
+            if (px < currentTime -startTime) {
+                cacheKey2Remove.add(key);
+            }
+        }
+        return cacheKey2Remove;
+    }
+
     private void startServerSocket() {
         // Uncomment this block to pass the first stage
         try {
@@ -40,6 +81,8 @@ public class Main {
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
             this.serverSocket.setReuseAddress(true);
+            // init job to clean local map
+            initCleanLocalMap();
             // Wait for connection from client.
             while (!this.serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept(); // blocking
