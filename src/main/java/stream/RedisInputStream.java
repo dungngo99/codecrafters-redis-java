@@ -1,7 +1,8 @@
+package stream;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 /**
  * Notes:
@@ -22,7 +23,7 @@ public class RedisInputStream extends FilterInputStream {
      * @param in the underlying input stream, or {@code null} if
      *           this instance is to be created without an underlying stream.
      */
-    protected RedisInputStream(InputStream in, int size) throws IOException {
+    public RedisInputStream(InputStream in, int size) throws IOException {
         super(in);
         buffer = new byte[size];
         in.read(buffer);
@@ -47,7 +48,7 @@ public class RedisInputStream extends FilterInputStream {
         return ans;
     }
 
-    private byte peekCurrentByte() {
+    public byte peekCurrentByte() {
         checkCursor(count);
         return buffer[count];
     }

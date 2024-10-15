@@ -1,34 +1,37 @@
+package service;
+
+import constants.ParserConstants;
+import handler.CommandHandler;
+import stream.RedisInputStream;
+
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+import static constants.ParserConstants.*;
 
 public class Parser {
 
-    private static final byte SIMPLE_STRING_PLUS = '+';
-    private static final byte SIMPLE_ERROR_MINUS = '-';
-    private static final byte INTEGER_COLON = ':';
-    private static final byte BULK_STRING_DOLLAR_SIGN = '$';
-    private static final byte ARRAY_ASTERISK = '*';
-    private static final byte TERMINATOR = -1;
-    private static final byte ZERO_TERMINATOR = 0;
-
     public static String process(RedisInputStream inputStream) throws IOException {
         byte b = (byte) inputStream.read();
+        Object obj;
         switch(b) {
             case ARRAY_ASTERISK:
-                Object ans = processNextArray(inputStream);
-                return convert(ans);
+                obj = processNextArray(inputStream);
+                break;
             case BULK_STRING_DOLLAR_SIGN:
-                return processNextString(inputStream);
+                obj = processNextString(inputStream);
+                break;
             case TERMINATOR:
             case ZERO_TERMINATOR:
-                return "";
+                obj = "";
+                break;
             default:
                 throw new RuntimeException("error here");
         }
+        return convert(obj);
     }
 
     private static String convert(Object object) {
@@ -39,24 +42,23 @@ public class Parser {
             return (String) object;
         }
         if (object instanceof List) {
-            StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
-            List list = (List) object;
-            // the first arg as redis command
-            if (list.size() == 1) {
-                String command = (String) list.get(0);
-                if (command.equalsIgnoreCase("ping")) {
-                    joiner.add("PONG");
-                } else {
-                    return "";
-                }
-            } else {
-                for (int i=1; i<list.size(); i++) {
-                    joiner.add(convert(list.get(i)));
-                }
-            }
-            return joiner.toString();
+            return convertList(object);
         }
         return String.valueOf(object);
+    }
+
+    private static String convertList(Object object) {
+        List list = (List) object;
+        if (list.isEmpty()) {
+            return "";
+        }
+        String command = (String) list.get(0);
+        CommandHandler commandHandler = CommandHandler.HANDLER_MAP.getOrDefault(command.toLowerCase(), null);
+        if (commandHandler == null) {
+            return "";
+        }
+        List args = list.subList(1, list.size());
+        return commandHandler.process(args);
     }
 
     private static List<Object> processNextArray(RedisInputStream inputStream) throws IOException {
@@ -82,6 +84,10 @@ public class Parser {
     }
 
     private static int processNextInt(RedisInputStream inputStream) throws IOException {
-        return inputStream.read() - ((int) '0');
+        List<Integer> digits = new ArrayList<>();
+        while (inputStream.peekCurrentByte() != CR) {
+            digits.add(inputStream.read() - ((int) '0'));
+        }
+        return Integer.parseInt(digits.stream().map(String::valueOf).collect(Collectors.joining("")));
     }
 }
