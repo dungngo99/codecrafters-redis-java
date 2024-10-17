@@ -1,5 +1,6 @@
 package service;
 
+import constants.OutputConstants;
 import constants.ParserConstants;
 import handler.CommandHandler;
 import stream.RedisInputStream;
@@ -8,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static constants.ParserConstants.*;
@@ -58,7 +60,8 @@ public class Parser {
             return "";
         }
         List args = list.subList(1, list.size());
-        return commandHandler.process(args);
+        String val = commandHandler.process(args);
+        return val != null && !val.isBlank() ? val : getBulkNull();
     }
 
     private static List<Object> processNextArray(RedisInputStream inputStream) throws IOException {
@@ -89,5 +92,11 @@ public class Parser {
             digits.add(inputStream.read() - ((int) '0'));
         }
         return Integer.parseInt(digits.stream().map(String::valueOf).collect(Collectors.joining("")));
+    }
+
+    private static String getBulkNull() {
+        StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
+        joiner.add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
+        return joiner.toString();
     }
 }

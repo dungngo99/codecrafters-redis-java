@@ -1,16 +1,14 @@
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
-import handler.impl.EchoHandler;
-import handler.impl.GetHandler;
-import handler.impl.PingHandler;
-import handler.impl.SetHandler;
+import handler.impl.*;
 import service.LocalMap;
 import service.Parser;
 import stream.RedisInputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -31,11 +29,28 @@ public class Main {
         this.port = port;
     }
 
+    private void registerNewEnvVars(String[] args) {
+        int length = args.length;
+        for(int i=0; i<length; i+=2) {
+            if (i+1>=length) {
+                break;
+            }
+            String key = args[i].substring(2);
+            String value = args[i+1];
+            setNewEnvProperty(key, value);
+        }
+    }
+
+    private void setNewEnvProperty(String key, String value) {
+        System.setProperty(key, value);
+    }
+
     private void registerCommandHandler() {
         new EchoHandler().register();
         new PingHandler().register();
         new SetHandler().register();
         new GetHandler().register();
+        new ConfigHandler().register();
     }
 
     private void initCleanLocalMap() {
@@ -134,6 +149,7 @@ public class Main {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here! with " + Arrays.toString(args));
         Main main = new Main(PORT);
+        main.registerNewEnvVars(args);
         main.registerCommandHandler();
         main.startServerSocket();
   }
