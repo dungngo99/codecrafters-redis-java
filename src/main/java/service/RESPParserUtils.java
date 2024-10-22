@@ -5,7 +5,7 @@ import constants.OutputConstants;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class ParserUtils {
+public class RESPParserUtils {
 
     public static String toRESPString(List<String> list) {
         StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");

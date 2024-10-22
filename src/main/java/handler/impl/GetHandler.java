@@ -1,12 +1,10 @@
 package handler.impl;
 
 import constants.OutputConstants;
-import constants.ParserConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
-import service.LocalMap;
-import service.Parser;
+import service.RedisLocalMap;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -24,11 +22,11 @@ public class GetHandler implements CommandHandler {
         }
         String key = (String) list.get(0);
         StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
-        if (!LocalMap.LOCAL_MAP.containsKey(key)) {
+        if (!RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             joiner
                     .add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
         } else {
-            Cache cache = LocalMap.LOCAL_MAP.get(key);
+            Cache cache = RedisLocalMap.LOCAL_MAP.get(key);
             String value = cache.getValue();
             joiner
                     .add(OutputConstants.DOLLAR_SIZE + value.length())

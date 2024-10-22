@@ -1,14 +1,11 @@
 import dto.Cache;
-import enums.Command;
-import handler.CommandHandler;
 import handler.impl.*;
-import service.LocalMap;
-import service.Parser;
+import service.RedisLocalMap;
+import service.RESPParser;
+import service.RDBLoaderUtils;
 import stream.RedisInputStream;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +48,12 @@ public class Main {
         new SetHandler().register();
         new GetHandler().register();
         new ConfigHandler().register();
+        new SaveHandler().register();
+        new KeysHandler().register();
+    }
+
+    private void registerRDB() {
+        RDBLoaderUtils.load();
     }
 
     private void initCleanLocalMap() {
@@ -63,7 +66,7 @@ public class Main {
                 Long currentTime = System.currentTimeMillis();
                 List<String> cacheKey2Remove = getCacheKey2Remove(currentTime);
                 for (String key: cacheKey2Remove) {
-                    LocalMap.LOCAL_MAP.remove(key);
+                    RedisLocalMap.LOCAL_MAP.remove(key);
                 }
                 Thread.sleep(10);
             }
@@ -74,7 +77,7 @@ public class Main {
 
     private static List<String> getCacheKey2Remove(Long currentTime) {
         List<String> cacheKey2Remove = new ArrayList<>();
-        for(Map.Entry<String, Cache> cacheEntry: LocalMap.LOCAL_MAP.entrySet()) {
+        for(Map.Entry<String, Cache> cacheEntry: RedisLocalMap.LOCAL_MAP.entrySet()) {
             String key = cacheEntry.getKey();
             Cache cache = cacheEntry.getValue();
             Long px = cache.getPx();
@@ -121,7 +124,7 @@ public class Main {
             // handle multiple commands from redis client
             while (!clientSocket.isClosed()) {
                 RedisInputStream redisInputStream = new RedisInputStream(clientSocket.getInputStream(), 1000);
-                String ans = Parser.process(redisInputStream);
+                String ans = RESPParser.process(redisInputStream);
                 OutputStream outputStream = clientSocket.getOutputStream();
                 try {
                     if (!ans.isBlank()) {
@@ -151,6 +154,7 @@ public class Main {
         Main main = new Main(PORT);
         main.registerNewEnvVars(args);
         main.registerCommandHandler();
+        main.registerRDB();
         main.startServerSocket();
   }
 }

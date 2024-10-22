@@ -10,4 +10,7 @@ public class OutputConstants {
     public static final String DIR_DEFAULT_VALUE = "/tmp/redis-files";
     public static final String DB_FILENAME = "dbfilename";
     public static final String DB_FILENAME_DEFAULT_VALUE = "dump.rdb";
+    public static final String KEYS_DELIMITER = "*";
+    public static final String SPACE_DELIMITER = " ";
+    public static final String REDIS_RDB_VERSION = "redis.rdb.version";
 }

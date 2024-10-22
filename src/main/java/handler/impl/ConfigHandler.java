@@ -3,12 +3,11 @@ package handler.impl;
 import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
-import service.ParserUtils;
+import service.RESPParserUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class ConfigHandler implements CommandHandler {
@@ -41,13 +40,13 @@ public class ConfigHandler implements CommandHandler {
 
     private String handleGet(List<Object> params) {
         if (params == null || params.isEmpty()) {
-            throw new RuntimeException("invalid param");
+            return "";
         }
         String param1 = ((String) params.get(0)).toLowerCase();
         if (OutputConstants.DIR.equalsIgnoreCase(param1) || OutputConstants.DB_FILENAME.equalsIgnoreCase(param1)) {
             String val = System.getProperty(param1);
             if (val != null) {
-                return ParserUtils.toRESPString(List.of(param1, val));
+                return RESPParserUtils.toRESPString(List.of(param1, val));
             }
         }
         return "";

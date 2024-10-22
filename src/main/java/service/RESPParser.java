@@ -1,7 +1,6 @@
 package service;
 
 import constants.OutputConstants;
-import constants.ParserConstants;
 import handler.CommandHandler;
 import stream.RedisInputStream;
 
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 
 import static constants.ParserConstants.*;
 
-public class Parser {
+public class RESPParser {
 
     public static String process(RedisInputStream inputStream) throws IOException {
         byte b = (byte) inputStream.read();

@@ -4,10 +4,9 @@ import constants.OutputConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
-import service.LocalMap;
+import service.RedisLocalMap;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.StringJoiner;
 
 public class SetHandler implements CommandHandler {
@@ -36,7 +35,7 @@ public class SetHandler implements CommandHandler {
         cache.setValue((String) value);
         cache.setPx(expiry);
         cache.setStartTime(System.currentTimeMillis());
-        LocalMap.LOCAL_MAP.put(key, cache);
+        RedisLocalMap.LOCAL_MAP.put(key, cache);
 
         StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
         joiner.add(OutputConstants.OK);
