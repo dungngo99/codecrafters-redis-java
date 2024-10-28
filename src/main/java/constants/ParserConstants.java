@@ -16,6 +16,7 @@ public class ParserConstants {
     public static final Integer REDIS_RDB_VERSION_MAX_VALUE = 100;
     public static final int MASK_TO_8_BIT_INT = 0xff;
     public static final String REDIS_RDB_DB_ID = "db.id";
+    public static final int SC_TO_MS_VALUE_CONVERTER = 1000;
 
     // REDIS RDB SECTION INDICATOR
     public static final int REDIS_RDB_OPCODE_MODULE_AUX = 247;
@@ -48,4 +49,7 @@ public class ParserConstants {
     public static final int REDIS_RDB_ENC_INT32 = 2;
     public static final int REDIS_RDB_ENC_LZF = 3;
 
+    // REDIS RDB NUMBER OF EXPIRY BITS
+    public static final int NUM_EXPIRY_BITS_SC = 4;
+    public static final int NUM_EXPIRY_BITS_MS = 8;
 }

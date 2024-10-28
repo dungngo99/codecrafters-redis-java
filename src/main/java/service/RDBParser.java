@@ -2,6 +2,8 @@ package service;
 
 import constants.OutputConstants;
 import constants.ParserConstants;
+import dto.KV;
+import enums.ExpiryType;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -27,6 +29,7 @@ public class RDBParser {
     private long kvPairSizeWithExpiry;
     private boolean isEOF;
     private byte[] checksum;
+    private KV curKV; // subject to frequent change
 
     public RDBParser(Path path) throws IOException {
         this.byteBuffer = ByteBuffer.allocate(BYTE_BUFFER_SIZE);
@@ -36,6 +39,7 @@ public class RDBParser {
         this.kvPairSize = 0L;
         this.kvPairSizeWithExpiry = 0L;
         this.isEOF = false;
+        this.curKV = null;
     }
 
     public void parse() throws IOException {
@@ -48,9 +52,9 @@ public class RDBParser {
             switch (valueType) {
                 case ParserConstants.REDIS_RDB_OPCODE_MODULE_AUX,
                         ParserConstants.REDIS_RDB_OPCODE_IDLE,
-                        ParserConstants.REDIS_RDB_OPCODE_FREQ,
-                        ParserConstants.REDIS_RDB_OPCODE_EXPIRE_TIME_MS, // treat expire_time_ms and expire_time_sc as branch even they store expiry for current key-value pair
-                        ParserConstants.REDIS_RDB_OPCODE_EXPIRE_TIME_SC -> throw new RuntimeException("not implemented yet");
+                        ParserConstants.REDIS_RDB_OPCODE_FREQ -> throw new RuntimeException("not implement yet");
+                case ParserConstants.REDIS_RDB_OPCODE_EXPIRE_TIME_MS -> handleExpireTimeMS();
+                case ParserConstants.REDIS_RDB_OPCODE_EXPIRE_TIME_SC -> handleExpireTime();
                 case ParserConstants.REDIS_RDB_OPCODE_AUX -> handleAux();
                 case ParserConstants.REDIS_RDB_OPCODE_RESIZE_DB -> handleDBResize();
                 case ParserConstants.REDIS_RDB_OPCODE_SELECT_DB -> handleDBSelect();
@@ -219,6 +223,22 @@ public class RDBParser {
         this.byteBuffer.flip();
     }
 
+    private void handleExpireTimeMS() throws IOException {
+        this.curKV = buildKVFromExpiryBytes(ExpiryType.MS, ParserConstants.NUM_EXPIRY_BITS_MS);
+    }
+
+    private void handleExpireTime() throws IOException {
+        this.curKV = buildKVFromExpiryBytes(ExpiryType.SC, ParserConstants.NUM_EXPIRY_BITS_SC);
+    }
+
+    private KV buildKVFromExpiryBytes(ExpiryType expiryType, int numExpiryBytes) throws IOException {
+        byte[] bytes = readNBytes(numExpiryBytes);
+        KV kv = new KV();
+        kv.setExpiryType(expiryType);
+        kv.setExpiryTime(RDBParserUtils.fromBytesV1(bytes));
+        return kv;
+    }
+
     private void handleAux() throws IOException {
         String key = readStringAsEncodedString();
         String value = readStringAsEncodedString();
@@ -231,6 +251,7 @@ public class RDBParser {
         // and "the number of keys with expirations", respectively
         this.kvPairSize = readLength();
         this.kvPairSizeWithExpiry = readLength();
+        System.out.println("[debug only] kvSize=" + this.kvPairSize + "; kvSize with expiry=" + this.kvPairSizeWithExpiry);
     }
 
     private void handleDBSelect() throws IOException {
@@ -249,6 +270,7 @@ public class RDBParser {
         this.isEOF = true;
         int version = Integer.parseInt(getConfigFromJVM(OutputConstants.REDIS_RDB_VERSION));
         this.checksum = version >= 5 ? this.readChecksum() : this.getEmptyChecksum();
+        System.out.println("[debug only] + checksum=" + this.checksum);
     }
 
     private byte[] readChecksum() {
@@ -263,7 +285,13 @@ public class RDBParser {
         // handle value type (already handled before reach here, or it's valueType)
         String key = readStringAsEncodedString();
         Object value = readValueAsEncodedValueType(valueType);
-        MAP.put(key, new Object[]{value});
+        if (this.curKV != null) {
+            long expiryTime = RDBParserUtils.convertExpiryTimeToMS(this.curKV.getExpiryTime(), this.curKV.getExpiryType());
+            MAP.put(key, new Object[]{value, String.valueOf(expiryTime)});
+            this.curKV = null;
+        } else {
+            MAP.put(key, new Object[]{value});
+        }
     }
 
     private String readStringAsEncodedString() throws IOException {

@@ -80,12 +80,11 @@ public class Main {
         for(Map.Entry<String, Cache> cacheEntry: RedisLocalMap.LOCAL_MAP.entrySet()) {
             String key = cacheEntry.getKey();
             Cache cache = cacheEntry.getValue();
-            Long px = cache.getPx();
-            Long startTime = cache.getStartTime();
-            if (px == null || startTime == null) {
+            Long expireTime = cache.getExpireTime();
+            if (expireTime == null) {
                 continue;
             }
-            if (px < currentTime -startTime) {
+            if (expireTime.equals(currentTime) || expireTime < currentTime) {
                 cacheKey2Remove.add(key);
             }
         }

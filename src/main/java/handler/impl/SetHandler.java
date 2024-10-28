@@ -33,8 +33,9 @@ public class SetHandler implements CommandHandler {
 
         Cache cache = new Cache();
         cache.setValue((String) value);
-        cache.setPx(expiry);
-        cache.setStartTime(System.currentTimeMillis());
+        if (expiry != null) {
+            cache.setExpireTime(System.currentTimeMillis() + expiry);
+        }
         RedisLocalMap.LOCAL_MAP.put(key, cache);
 
         StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");

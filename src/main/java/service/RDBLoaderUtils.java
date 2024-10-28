@@ -70,8 +70,7 @@ public class RDBLoaderUtils {
         Cache cache = new Cache();
         cache.setValue(value[0]);
         if (value.length == 2) {
-            cache.setPx(Long.getLong(value[1]));
-            cache.setStartTime(System.currentTimeMillis());
+            cache.setExpireTime(Long.parseLong(value[1]));
         }
         RedisLocalMap.LOCAL_MAP.put(key, cache);
     }

@@ -2,8 +2,7 @@ package dto;
 
 public class Cache {
     private String value;
-    private Long px;
-    private Long startTime;
+    private Long expireTime;
 
     public String getValue() {
         return value;
@@ -13,19 +12,11 @@ public class Cache {
         this.value = value;
     }
 
-    public Long getPx() {
-        return px;
+    public Long getExpireTime() {
+        return expireTime;
     }
 
-    public void setPx(Long px) {
-        this.px = px;
-    }
-
-    public Long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
+    public void setExpireTime(Long expireTime) {
+        this.expireTime = expireTime;
     }
 }
