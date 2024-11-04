@@ -1,6 +1,8 @@
 package service;
 
 import constants.OutputConstants;
+import dto.Master;
+import enums.RoleType;
 
 import java.util.Objects;
 
@@ -20,7 +22,24 @@ public class SystemPropHelper {
         if (Objects.nonNull(role)) {
             return role;
         }
-        System.setProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, OutputConstants.REDIS_SERVER_DEFAULT_ROLE);
-        return OutputConstants.REDIS_SERVER_DEFAULT_ROLE;
+        String replicaOf = System.getProperty(OutputConstants.REDIS_SERVER_REPLICA_OF);
+        if (Objects.nonNull(replicaOf) && !replicaOf.isEmpty()) {
+            System.setProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.SLAVE.name().toLowerCase());
+        } else {
+            System.setProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.MASTER.name().toLowerCase());
+        }
+        return System.getProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE);
+    }
+
+    public static Master getServerMaster() {
+        String masterVal = System.getProperty(OutputConstants.REDIS_SERVER_REPLICA_OF);
+        if (Objects.isNull(masterVal) || masterVal.isEmpty()) {
+            return null;
+        }
+        String[] masterValues = masterVal.split(OutputConstants.SPACE_DELIMITER);
+        if (masterValues.length < 2) {
+            return null;
+        }
+        return new Master(masterValues[0], Integer.parseInt(masterValues[1]));
     }
 }

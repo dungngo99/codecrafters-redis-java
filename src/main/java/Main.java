@@ -1,4 +1,5 @@
 import dto.Cache;
+import dto.Master;
 import handler.impl.*;
 import service.RedisLocalMap;
 import service.RESPParser;
@@ -21,6 +22,7 @@ public class Main {
     private ServerSocket serverSocket;
     private int port;
     private String role;
+    private Master master;
 
     public Main() {}
 
@@ -95,6 +97,7 @@ public class Main {
         try {
             this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
             this.role = SystemPropHelper.getSetServerRoleOrDefault();
+            this.master = SystemPropHelper.getServerMaster();
             this.serverSocket = new ServerSocket(this.port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors

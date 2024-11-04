@@ -15,7 +15,7 @@ public class OutputConstants {
     public static final String REDIS_RDB_VERSION = "redis.rdb.version";
     public static final int DEFAULT_REDIS_SERVER_PORT = 6379;
     public static final String REDIS_SERVER_PORT_KEY = "port";
-    public static final String REDIS_SERVER_DEFAULT_ROLE = "master";
     public static final String REDIS_SERVER_ROLE_TYPE = "role";
     public static final String COLON_DELIMITER = ":";
+    public static final String REDIS_SERVER_REPLICA_OF = "replicaof";
 }
