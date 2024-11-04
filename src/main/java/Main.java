@@ -3,6 +3,7 @@ import handler.impl.*;
 import service.RedisLocalMap;
 import service.RESPParser;
 import service.RDBLoaderUtils;
+import service.SystemPropHelper;
 import stream.RedisInputStream;
 
 import java.io.*;
@@ -17,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-
-    private static final int PORT = 6379;
     private ServerSocket serverSocket;
     private int port;
+
+    public Main() {}
 
     public Main(int port) {
         this.port = port;
@@ -32,14 +33,10 @@ public class Main {
             if (i+1>=length) {
                 break;
             }
-            String key = args[i].substring(2);
+            String key = args[i].substring(2).toLowerCase();
             String value = args[i+1];
-            setNewEnvProperty(key, value);
+            SystemPropHelper.setNewEnvProperty(key, value);
         }
-    }
-
-    private void setNewEnvProperty(String key, String value) {
-        System.setProperty(key, value);
     }
 
     private void registerCommandHandler() {
@@ -94,6 +91,7 @@ public class Main {
     private void startServerSocket() {
         // Uncomment this block to pass the first stage
         try {
+            this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
             this.serverSocket = new ServerSocket(this.port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
@@ -150,7 +148,7 @@ public class Main {
   public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         System.out.println("Logs from your program will appear here! with " + Arrays.toString(args));
-        Main main = new Main(PORT);
+        Main main = new Main();
         main.registerNewEnvVars(args);
         main.registerCommandHandler();
         main.registerRDB();
