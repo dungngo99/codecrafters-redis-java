@@ -16,7 +16,7 @@ public class PingHandler implements CommandHandler {
 
     @Override
     public String process(List list) {
-        StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
         joiner.add(OutputConstants.PONG);
         return joiner.toString();
     }

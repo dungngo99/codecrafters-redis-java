@@ -38,7 +38,7 @@ public class SetHandler implements CommandHandler {
         }
         RedisLocalMap.LOCAL_MAP.put(key, cache);
 
-        StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
         joiner.add(OutputConstants.OK);
         return joiner.toString();
     }

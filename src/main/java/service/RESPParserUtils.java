@@ -8,7 +8,7 @@ import java.util.StringJoiner;
 public class RESPParserUtils {
 
     public static String toRESPString(List<String> list) {
-        StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + list.size());
         for (String str: list) {
             joiner.add(OutputConstants.DOLLAR_SIZE + str.length());

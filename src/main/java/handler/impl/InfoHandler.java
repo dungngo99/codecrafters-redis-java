@@ -5,10 +5,7 @@ import enums.Command;
 import handler.CommandHandler;
 import service.SystemPropHelper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Function;
 
 public class InfoHandler implements CommandHandler {
@@ -41,14 +38,30 @@ public class InfoHandler implements CommandHandler {
         if (!list.isEmpty()) {
             throw new RuntimeException("invalid param");
         }
+        Map<String, String> replicationMap = getReplicationMap();
+        String data  = getDataFromReplicationMap(replicationMap);
+        int length = data.length();
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.DOLLAR_SIZE, OutputConstants.CRLF);
+        joiner.add(String.valueOf(length));
+        joiner.add(data);
+        return joiner.toString();
+    }
+
+    private Map<String, String> getReplicationMap() {
+        Map<String, String> map = new HashMap<>();
         String role = SystemPropHelper.getSetServerRoleOrDefault();
-        String bulkString = new StringJoiner(OutputConstants.COLON_DELIMITER)
-                .add(OutputConstants.REDIS_SERVER_ROLE_TYPE)
-                .add(role)
-                .toString();
-        StringJoiner joiner = new StringJoiner("\r\n", OutputConstants.DOLLAR_SIZE, "\r\n");
-        joiner.add(String.valueOf(bulkString.length()));
-        joiner.add(bulkString);
+        map.put(OutputConstants.REDIS_SERVER_ROLE_TYPE, role);
+        String masterReplId = SystemPropHelper.getSetMasterReplId();
+        map.put(OutputConstants.MASTER_REPLID, masterReplId);
+        map.put(OutputConstants.MASTER_REPL_OFFSET, String.valueOf(OutputConstants.MASTER_REPL_OFFSET_DEFAULT));
+        return map;
+    }
+
+    private String getDataFromReplicationMap(Map<String, String> replicationMap) {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
+        for (Map.Entry<String, String> entry: replicationMap.entrySet()) {
+            joiner.add(entry.getKey() + OutputConstants.COLON_DELIMITER + entry.getValue());
+        }
         return joiner.toString();
     }
 }

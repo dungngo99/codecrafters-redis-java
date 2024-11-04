@@ -25,7 +25,7 @@ public class SaveHandler implements CommandHandler {
             return "";
         }
         RDBLoaderUtils.load();
-        StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
         joiner.add(OutputConstants.OK);
         return joiner.toString();
     }

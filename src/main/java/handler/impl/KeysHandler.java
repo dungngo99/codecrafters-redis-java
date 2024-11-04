@@ -68,7 +68,7 @@ public class KeysHandler implements CommandHandler {
         if (caches.isEmpty()) {
             return "";
         }
-        StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + caches.size());
         caches.stream()
                 .map(Map.Entry::getKey)

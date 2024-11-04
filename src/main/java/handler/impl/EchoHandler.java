@@ -1,5 +1,6 @@
 package handler.impl;
 
+import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
 
@@ -17,7 +18,7 @@ public class EchoHandler implements CommandHandler {
         if (list == null || list.isEmpty()) {
             return "";
         }
-        StringJoiner joiner = new StringJoiner("\r\n", "+", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
         joiner.add((String) list.getFirst());
         return joiner.toString();
     }

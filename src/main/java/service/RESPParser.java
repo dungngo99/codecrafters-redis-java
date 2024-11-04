@@ -94,7 +94,7 @@ public class RESPParser {
     }
 
     private static String getBulkNull() {
-        StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
         joiner.add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
         return joiner.toString();
     }

@@ -1,6 +1,7 @@
 package constants;
 
 public class OutputConstants {
+    public static final String CRLF = "\r\n";
     public static final String PONG = "PONG";
     public static final String OK = "OK";
     public static final String NULL_BULK = "-1";
@@ -18,4 +19,8 @@ public class OutputConstants {
     public static final String REDIS_SERVER_ROLE_TYPE = "role";
     public static final String COLON_DELIMITER = ":";
     public static final String REDIS_SERVER_REPLICA_OF = "replicaof";
+    public static final int MASTER_REPLID_LENGTH = 40;
+    public static final String MASTER_REPLID = "master_replid";
+    public static final int MASTER_REPL_OFFSET_DEFAULT = 0;
+    public static final String MASTER_REPL_OFFSET = "master_repl_offset";
 }

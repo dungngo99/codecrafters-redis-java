@@ -24,9 +24,9 @@ public class SystemPropHelper {
         }
         String replicaOf = System.getProperty(OutputConstants.REDIS_SERVER_REPLICA_OF);
         if (Objects.nonNull(replicaOf) && !replicaOf.isEmpty()) {
-            System.setProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.SLAVE.name().toLowerCase());
+            setNewEnvProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.SLAVE.name().toLowerCase());
         } else {
-            System.setProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.MASTER.name().toLowerCase());
+            setNewEnvProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE, RoleType.MASTER.name().toLowerCase());
         }
         return System.getProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE);
     }
@@ -41,5 +41,15 @@ public class SystemPropHelper {
             return null;
         }
         return new Master(masterValues[0], Integer.parseInt(masterValues[1]));
+    }
+
+    public static String getSetMasterReplId() {
+        String value = System.getProperty(OutputConstants.MASTER_REPLID);
+        if (Objects.nonNull(value)) {
+            return value;
+        }
+        value = RandomUtils.randomLowerAlphaNumericByLength(OutputConstants.MASTER_REPLID_LENGTH);
+        setNewEnvProperty(OutputConstants.MASTER_REPLID, value);
+        return value;
     }
 }

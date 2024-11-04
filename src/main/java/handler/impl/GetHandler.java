@@ -21,7 +21,7 @@ public class GetHandler implements CommandHandler {
             return "";
         }
         String key = (String) list.get(0);
-        StringJoiner joiner = new StringJoiner("\r\n", "", "\r\n");
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
         if (!RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             joiner
                     .add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
