@@ -1,5 +1,8 @@
+import client.Client;
+import constants.OutputConstants;
 import dto.Cache;
 import dto.Master;
+import enums.RoleType;
 import handler.impl.*;
 import service.RedisLocalMap;
 import service.RESPParser;
@@ -13,13 +16,11 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
     private ServerSocket serverSocket;
+    private Socket socket2Master;
     private int port;
     private String role;
     private Master master;
@@ -28,6 +29,7 @@ public class Main {
 
     public Main(int port) {
         this.port = port;
+        this.socket2Master = null;
     }
 
     private void registerNewEnvVars(String[] args) {
@@ -95,9 +97,7 @@ public class Main {
     private void startServerSocket() {
         // Uncomment this block to pass the first stage
         try {
-            this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
-            this.role = SystemPropHelper.getSetServerRoleOrDefault();
-            this.master = SystemPropHelper.getServerMaster();
+            // start redis-server
             this.serverSocket = new ServerSocket(this.port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
@@ -119,6 +119,37 @@ public class Main {
             } catch (IOException e) {
                 System.out.println("IOException: " + e.getMessage());
             }
+        }
+    }
+
+    private void fillRedisServerInfo() {
+        this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
+        this.role = SystemPropHelper.getSetServerRoleOrDefault();
+        this.master = SystemPropHelper.getServerMaster();
+    }
+
+    private void preCheck() {
+        System.out.println("Pre-check if redis-server can be started");
+        if (!RoleType.MASTER.name().equalsIgnoreCase(this.role) && Objects.equals(this.port, OutputConstants.DEFAULT_REDIS_MASTER_SERVER_PORT)) {
+            throw new RuntimeException("not allow non-master node to use default master port=6379");
+        }
+    }
+
+    private void handshake2Master() {
+        if (RoleType.MASTER.name().equalsIgnoreCase(this.role)) {
+            return;
+        }
+        if (Objects.isNull(this.master) || Objects.isNull(this.master.getHost()) || this.master.getPort() <= 0) {
+            throw new RuntimeException("replica node is missing master's host or port");
+        }
+        try {
+            this.socket2Master = new Socket(this.master.getHost(), this.master.getPort());
+            OutputStream outputStream = this.socket2Master.getOutputStream();
+            outputStream.write(Client.getRESPPing().getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+            System.out.println("sent PING command to master");
+        } catch(IOException e) {
+            throw new RuntimeException("failed to PING master node, ignore handshake");
         }
     }
 
@@ -158,6 +189,9 @@ public class Main {
         main.registerNewEnvVars(args);
         main.registerCommandHandler();
         main.registerRDB();
+        main.fillRedisServerInfo();
+        main.preCheck();
+        main.handshake2Master();
         main.startServerSocket();
   }
 }

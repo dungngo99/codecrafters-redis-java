@@ -14,7 +14,7 @@ public class SystemPropHelper {
 
     public static int getServerPortOrDefault() {
         String ans = System.getProperty(OutputConstants.REDIS_SERVER_PORT_KEY);
-        return Objects.nonNull(ans) ? Integer.parseInt(ans) : OutputConstants.DEFAULT_REDIS_SERVER_PORT;
+        return Objects.nonNull(ans) ? Integer.parseInt(ans) : OutputConstants.DEFAULT_REDIS_MASTER_SERVER_PORT;
     }
 
     public static String getSetServerRoleOrDefault() {
