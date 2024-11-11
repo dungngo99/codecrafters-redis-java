@@ -72,7 +72,7 @@ public class Main {
                 for (String key: cacheKey2Remove) {
                     RedisLocalMap.LOCAL_MAP.remove(key);
                 }
-                Thread.sleep(10);
+                Thread.sleep(Duration.of(100, ChronoUnit.MICROS));
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -144,15 +144,9 @@ public class Main {
         if (Objects.isNull(this.master) || Objects.isNull(this.master.getHost()) || this.master.getPort() <= 0) {
             throw new RuntimeException("replica node is missing master's host or port");
         }
-        try {
-            this.client.connect2Master();
-            this.client.sendRespPING();
-            this.client.sendRespListeningPort();
-            this.client.sendRespCapa();
-            this.client.sendRespPsync();
-        } catch(IOException e) {
-            throw new RuntimeException("failed to PING master node, ignore handshake");
-        }
+        this.client.connect2Master();
+        new Thread(this.client::listenHandshakeFromMaster).start();
+        this.client.sendHandshake2Master();
     }
 
     private static void handleClientConnection(Socket clientSocket) {

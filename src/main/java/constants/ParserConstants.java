@@ -10,6 +10,7 @@ public class ParserConstants {
     public static final byte ZERO_TERMINATOR = 0;
     public static final byte CR = '\r';
     public static final byte LF = '\n';
+    public static final Integer CRLF_LENGTH = 2;
     public static final String MAGIC_NUMBER = "REDIS";
     public static final Integer REDIS_RDB_MAGIC_NUMBER_BYTE_LENGTH = 5;
     public static final Integer REDIS_RDB_VERSION_BYTE_LENGTH = 4;

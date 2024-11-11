@@ -1,6 +1,5 @@
 package service;
 
-import constants.OutputConstants;
 import handler.CommandHandler;
 import stream.RedisInputStream;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static constants.ParserConstants.*;
@@ -24,6 +22,9 @@ public class RESPParser {
                 break;
             case BULK_STRING_DOLLAR_SIGN:
                 obj = processNextString(inputStream);
+                break;
+            case SIMPLE_STRING_PLUS:
+                obj = processSimpleString(inputStream);
                 break;
             case TERMINATOR:
             case ZERO_TERMINATOR:
@@ -77,6 +78,20 @@ public class RESPParser {
         int size = processNextInt(inputStream);
         inputStream.skipCRLF();
         return processNextString0(inputStream, size);
+    }
+
+    private static String processSimpleString(RedisInputStream inputStream) throws IOException {
+        List<Byte> byteList = new ArrayList<>();
+        while (true) {
+            byte b = inputStream.peekCurrentByte();
+            if (b == '\r' || b == '\n') {
+                inputStream.skipNByte(CRLF_LENGTH);
+                break;
+            }
+            byteList.add(inputStream.readByte());
+        }
+        byte[] bytes = RESPUtils.fromByteList(byteList);
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     private static String processNextString0(RedisInputStream inputStream, int size) throws IOException {

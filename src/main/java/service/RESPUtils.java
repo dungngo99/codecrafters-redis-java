@@ -52,4 +52,13 @@ public class RESPUtils {
     public static String getRESPOk() {
         return toSimpleString(OutputConstants.OK);
     }
+
+    public static byte[] fromByteList(List<Byte> list) {
+        int l = list.size();
+        byte[] array = new byte[l];
+        for (int i=0; i<l; i++) {
+            array[i] = list.get(i);
+        }
+        return array;
+    }
 }

@@ -48,6 +48,10 @@ public class RedisInputStream extends FilterInputStream {
         return ans;
     }
 
+    public byte readByte() throws IOException {
+        return (byte) read();
+    }
+
     public byte peekCurrentByte() {
         checkCursor(count);
         return buffer[count];
@@ -64,6 +68,10 @@ public class RedisInputStream extends FilterInputStream {
         if (b == '\r') {
             readNBytes(2);
         }
+    }
+
+    public void skipNByte(int n) throws IOException {
+        readNBytes(n);
     }
 
     public byte[] getBuffer() {

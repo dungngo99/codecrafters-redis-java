@@ -29,8 +29,7 @@ public class ReplConfigHandler implements CommandHandler {
         if (!SUB_COMMANDS.containsKey(subcommand)) {
             throw new RuntimeException("invalid param");
         }
-        SUB_COMMANDS.get(subcommand).apply(list.subList(1, list.size()));
-        return null;
+        return SUB_COMMANDS.get(subcommand).apply(list.subList(1, list.size()));
     }
 
     private String handleListeningPort(List list) {
