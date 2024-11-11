@@ -32,8 +32,13 @@ public class ReplicaClient {
         return RESPUtils.toArray(list);
     }
 
-    protected  static String getRESPReplConfCapa() {
+    protected static String getRESPReplConfCapa() {
         List<String> list = List.of(Command.REPLCONF.name(), Command.CAPA.getAlias(), OutputConstants.REPLICA_PSYNC2);
+        return RESPUtils.toArray(list);
+    }
+
+    protected  static String getRESPPsync() {
+        List<String> list = List.of(Command.PSYNC.name(), OutputConstants.QUESTION_MARK, OutputConstants.NULL_BULK);
         return RESPUtils.toArray(list);
     }
     
@@ -70,6 +75,18 @@ public class ReplicaClient {
             System.out.println("sent REPLCONF capa psync2 command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's capa psync2 to master node, ignore handshake");
+        }
+    }
+
+    public void sendRespPsync() {
+        try {
+            OutputStream outputStream = this.replica2Master.getOutputStream();
+            outputStream.write(ReplicaClient.getRESPPsync().getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+            Thread.sleep(200);
+            System.out.println("send PSYNC command to master");
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("failed to send replica's psync to master node, ignore handshake");
         }
     }
 }

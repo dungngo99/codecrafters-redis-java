@@ -13,7 +13,9 @@ public enum Command {
     REPLICATION("replication"),
     REPLCONF("replconf"),
     LISTENING_PORT("listening-port"),
-    CAPA("capa");
+    CAPA("capa"),
+    PSYNC("psync")
+    ;
 
     private String alias;
 

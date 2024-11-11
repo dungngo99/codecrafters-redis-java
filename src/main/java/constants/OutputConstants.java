@@ -28,4 +28,6 @@ public class OutputConstants {
     public static final String MASTER_REPL_OFFSET = "master_repl_offset";
     public static final Integer RESP_PING_ARRAY_LENGTH = 1;
     public static final String REPLICA_PSYNC2 = "psync2";
+    public static final String REPLICA_FULL_RESYNC = "FULLRESYNC";
+    public static final String QUESTION_MARK = "?";
 }

@@ -53,6 +53,7 @@ public class Main {
         new KeysHandler().register();
         new InfoHandler().register();
         new ReplConfigHandler().register();
+        new PsyncHandler().register();
     }
 
     private void registerRDB() {
@@ -148,6 +149,7 @@ public class Main {
             this.client.sendRespPING();
             this.client.sendRespListeningPort();
             this.client.sendRespCapa();
+            this.client.sendRespPsync();
         } catch(IOException e) {
             throw new RuntimeException("failed to PING master node, ignore handshake");
         }
