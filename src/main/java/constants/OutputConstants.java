@@ -8,6 +8,8 @@ public class OutputConstants {
     public static final String NULL_BULK = "-1";
     public static final String DOLLAR_SIZE = "$";
     public static final String ASTERISK = "*";
+    public static final String PLUS = "+";
+    public static final String EMPTY = "";
     public static final String DIR = "dir";
     public static final String DIR_DEFAULT_VALUE = "/tmp/redis-files";
     public static final String DB_FILENAME = "dbfilename";
@@ -25,4 +27,5 @@ public class OutputConstants {
     public static final int MASTER_REPL_OFFSET_DEFAULT = 0;
     public static final String MASTER_REPL_OFFSET = "master_repl_offset";
     public static final Integer RESP_PING_ARRAY_LENGTH = 1;
+    public static final String REPLICA_PSYNC2 = "psync2";
 }

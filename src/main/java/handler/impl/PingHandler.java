@@ -3,6 +3,7 @@ package handler.impl;
 import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
+import service.RESPUtils;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -16,8 +17,6 @@ public class PingHandler implements CommandHandler {
 
     @Override
     public String process(List list) {
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
-        joiner.add(OutputConstants.PONG);
-        return joiner.toString();
+        return RESPUtils.toSimpleString(OutputConstants.PONG);
     }
 }

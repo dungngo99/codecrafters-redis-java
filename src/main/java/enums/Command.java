@@ -1,5 +1,27 @@
 package enums;
 
 public enum Command {
-    PING, ECHO, GET, SET, PX, CONFIG, SAVE, KEYS, INFO, REPLICATION;
+    PING("ping"),
+    ECHO("echo"),
+    GET("get"),
+    SET("set"),
+    PX("px"),
+    CONFIG("config"),
+    SAVE("save"),
+    KEYS("keys"),
+    INFO("info"),
+    REPLICATION("replication"),
+    REPLCONF("replconf"),
+    LISTENING_PORT("listening-port"),
+    CAPA("capa");
+
+    private String alias;
+
+    Command(String alias) {
+        this.alias = alias;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
 }

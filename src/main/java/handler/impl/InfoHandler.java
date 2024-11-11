@@ -3,6 +3,7 @@ package handler.impl;
 import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
+import service.RESPUtils;
 import service.SystemPropHelper;
 
 import java.util.*;
@@ -40,11 +41,7 @@ public class InfoHandler implements CommandHandler {
         }
         Map<String, String> replicationMap = getReplicationMap();
         String data  = getDataFromReplicationMap(replicationMap);
-        int length = data.length();
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.DOLLAR_SIZE, OutputConstants.CRLF);
-        joiner.add(String.valueOf(length));
-        joiner.add(data);
-        return joiner.toString();
+        return RESPUtils.toBulkString(data);
     }
 
     private Map<String, String> getReplicationMap() {

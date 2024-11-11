@@ -4,6 +4,7 @@ import constants.OutputConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
+import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.util.List;
@@ -21,17 +22,12 @@ public class GetHandler implements CommandHandler {
             return "";
         }
         String key = (String) list.get(0);
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
         if (!RedisLocalMap.LOCAL_MAP.containsKey(key)) {
-            joiner
-                    .add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
+            return RESPUtils.getBulkNull();
         } else {
             Cache cache = RedisLocalMap.LOCAL_MAP.get(key);
             String value = cache.getValue();
-            joiner
-                    .add(OutputConstants.DOLLAR_SIZE + value.length())
-                    .add(value);
+            return RESPUtils.toBulkString(value);
         }
-        return joiner.toString();
     }
 }

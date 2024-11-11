@@ -3,6 +3,7 @@ package handler.impl;
 import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
+import service.RESPUtils;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -18,8 +19,6 @@ public class EchoHandler implements CommandHandler {
         if (list == null || list.isEmpty()) {
             return "";
         }
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "+", OutputConstants.CRLF);
-        joiner.add((String) list.getFirst());
-        return joiner.toString();
+        return RESPUtils.getRESPEcho((String) list.getFirst());
     }
 }

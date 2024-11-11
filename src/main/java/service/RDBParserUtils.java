@@ -74,6 +74,6 @@ public class RDBParserUtils {
         if (Objects.equals(expType, ExpiryType.MS)) {
             return ts;
         }
-        return ts* ParserConstants.SC_TO_MS_VALUE_CONVERTER;
+        return ts*ParserConstants.SC_TO_MS_VALUE_CONVERTER;
     }
 }

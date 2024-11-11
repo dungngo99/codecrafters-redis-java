@@ -3,7 +3,7 @@ package handler.impl;
 import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
-import service.RESPParserUtils;
+import service.RESPUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +46,7 @@ public class ConfigHandler implements CommandHandler {
         if (OutputConstants.DIR.equalsIgnoreCase(param1) || OutputConstants.DB_FILENAME.equalsIgnoreCase(param1)) {
             String val = System.getProperty(param1);
             if (val != null) {
-                return RESPParserUtils.toRESPString(List.of(param1, val));
+                return RESPUtils.toArray(List.of(param1, val));
             }
         }
         return "";

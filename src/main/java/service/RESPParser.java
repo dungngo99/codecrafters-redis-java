@@ -60,7 +60,7 @@ public class RESPParser {
         }
         List args = list.subList(1, list.size());
         String val = commandHandler.process(args);
-        return val != null && !val.isBlank() ? val : getBulkNull();
+        return val != null && !val.isBlank() ? val : RESPUtils.getBulkNull();
     }
 
     private static List<Object> processNextArray(RedisInputStream inputStream) throws IOException {
@@ -91,11 +91,5 @@ public class RESPParser {
             digits.add(inputStream.read() - ((int) '0'));
         }
         return Integer.parseInt(digits.stream().map(String::valueOf).collect(Collectors.joining("")));
-    }
-
-    private static String getBulkNull() {
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
-        joiner.add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
-        return joiner.toString();
     }
 }

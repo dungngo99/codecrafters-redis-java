@@ -1,4 +1,4 @@
-import client.Client;
+import client.ReplicaClient;
 import constants.OutputConstants;
 import dto.Cache;
 import dto.Master;
@@ -20,16 +20,15 @@ import java.util.*;
 
 public class Main {
     private ServerSocket serverSocket;
-    private Socket socket2Master;
     private int port;
     private String role;
     private Master master;
+    private ReplicaClient client;
 
     public Main() {}
 
     public Main(int port) {
         this.port = port;
-        this.socket2Master = null;
     }
 
     private void registerNewEnvVars(String[] args) {
@@ -53,6 +52,7 @@ public class Main {
         new SaveHandler().register();
         new KeysHandler().register();
         new InfoHandler().register();
+        new ReplConfigHandler().register();
     }
 
     private void registerRDB() {
@@ -126,6 +126,7 @@ public class Main {
         this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
         this.role = SystemPropHelper.getSetServerRoleOrDefault();
         this.master = SystemPropHelper.getServerMaster();
+        this.client = new ReplicaClient(this.master);
     }
 
     private void preCheck() {
@@ -143,11 +144,10 @@ public class Main {
             throw new RuntimeException("replica node is missing master's host or port");
         }
         try {
-            this.socket2Master = new Socket(this.master.getHost(), this.master.getPort());
-            OutputStream outputStream = this.socket2Master.getOutputStream();
-            outputStream.write(Client.getRESPPing().getBytes(StandardCharsets.UTF_8));
-            outputStream.flush();
-            System.out.println("sent PING command to master");
+            this.client.connect2Master();
+            this.client.sendRespPING();
+            this.client.sendRespListeningPort();
+            this.client.sendRespCapa();
         } catch(IOException e) {
             throw new RuntimeException("failed to PING master node, ignore handshake");
         }

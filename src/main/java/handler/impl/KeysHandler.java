@@ -4,6 +4,7 @@ import constants.OutputConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
+import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.util.List;
@@ -68,13 +69,9 @@ public class KeysHandler implements CommandHandler {
         if (caches.isEmpty()) {
             return "";
         }
-        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, "", OutputConstants.CRLF);
-        joiner.add(OutputConstants.ASTERISK + caches.size());
-        caches.stream()
+        List<String> keys = caches.stream()
                 .map(Map.Entry::getKey)
-                .forEach(k -> joiner
-                        .add(OutputConstants.DOLLAR_SIZE + k.length())
-                        .add(k));
-        return joiner.toString();
+                .toList();
+        return RESPUtils.toArray(keys);
     }
 }
