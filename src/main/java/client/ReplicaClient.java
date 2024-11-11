@@ -55,7 +55,7 @@ public class ReplicaClient {
             OutputStream outputStream = this.replica2Master.getOutputStream();
             outputStream.write(RESPUtils.getRESPPing().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
-            Thread.sleep(OutputConstants.THREAD_SLEEP_10_MILLIS); // temporary solution
+            Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
             System.out.println("sent PING command to master");
         } catch(IOException | InterruptedException e) {
             throw new RuntimeException("failed to PING master node, ignore handshake", e);
@@ -67,7 +67,7 @@ public class ReplicaClient {
             OutputStream outputStream = this.replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfListeningPort().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
-            Thread.sleep(OutputConstants.THREAD_SLEEP_10_MILLIS); // temporary solution
+            Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
             System.out.println("sent REPLCONF listening-port command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's listening port to master node, ignore handshake", e);
@@ -79,7 +79,7 @@ public class ReplicaClient {
             OutputStream outputStream = this.replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfCapa().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
-            Thread.sleep(OutputConstants.THREAD_SLEEP_10_MILLIS); // temporary solution
+            Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
             System.out.println("sent REPLCONF capa psync2 command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's capa psync2 to master node, ignore handshake", e);
@@ -91,7 +91,7 @@ public class ReplicaClient {
             OutputStream outputStream = this.replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPPsync().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
-            Thread.sleep(OutputConstants.THREAD_SLEEP_10_MILLIS); // temporary solution
+            Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
             System.out.println("send PSYNC command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's psync to master node, ignore handshake", e);

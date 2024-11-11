@@ -30,5 +30,5 @@ public class OutputConstants {
     public static final String REPLICA_PSYNC2 = "psync2";
     public static final String REPLICA_FULL_RESYNC = "FULLRESYNC";
     public static final String QUESTION_MARK = "?";
-    public static final Integer THREAD_SLEEP_10_MILLIS = 10;
+    public static final Integer THREAD_SLEEP_100_MILLIS = 100;
 }
