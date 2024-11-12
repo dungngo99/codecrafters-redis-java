@@ -172,6 +172,8 @@ public class Main {
                         // attempt to write. If EOF or Broken pipeline, break the loop
                         outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
                         outputStream.flush();
+                    }
+                    if (this.masterManager != null) {
                         this.masterManager.transferEmptyRDBFile(ans, clientSocket);
                     }
                 } catch (IOException e) {
