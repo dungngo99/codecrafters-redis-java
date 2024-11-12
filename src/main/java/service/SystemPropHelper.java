@@ -1,7 +1,7 @@
 package service;
 
 import constants.OutputConstants;
-import dto.Master;
+import dto.MasterNode;
 import enums.RoleType;
 
 import java.util.Objects;
@@ -10,6 +10,11 @@ public class SystemPropHelper {
 
     public static void setNewEnvProperty(String key, String value) {
         System.setProperty(key, value);
+    }
+
+    public static String getServerHostOrDefault() {
+         String ans = System.getProperty(OutputConstants.REDIS_SERVER_HOST_KEY);
+         return Objects.nonNull(ans) ? ans : OutputConstants.DEFAULT_REDSI_SERVER_HOST;
     }
 
     public static int getServerPortOrDefault() {
@@ -31,7 +36,7 @@ public class SystemPropHelper {
         return System.getProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE);
     }
 
-    public static Master getServerMaster() {
+    public static MasterNode getServerMaster() {
         String masterVal = System.getProperty(OutputConstants.REDIS_SERVER_REPLICA_OF);
         if (Objects.isNull(masterVal) || masterVal.isEmpty()) {
             return null;
@@ -40,7 +45,7 @@ public class SystemPropHelper {
         if (masterValues.length < 2) {
             return null;
         }
-        return new Master(masterValues[0], Integer.parseInt(masterValues[1]));
+        return new MasterNode(masterValues[0], Integer.parseInt(masterValues[1]));
     }
 
     public static String getSetMasterReplId() {

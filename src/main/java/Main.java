@@ -1,13 +1,12 @@
-import client.ReplicaClient;
+import dto.MasterNode;
+import dto.ServerNode;
+import replication.MasterManager;
+import replication.ReplicaClient;
 import constants.OutputConstants;
 import dto.Cache;
-import dto.Master;
 import enums.RoleType;
 import handler.impl.*;
-import service.RedisLocalMap;
-import service.RESPParser;
-import service.RDBLoaderUtils;
-import service.SystemPropHelper;
+import service.*;
 import stream.RedisInputStream;
 
 import java.io.*;
@@ -19,16 +18,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Main {
-    private ServerSocket serverSocket;
-    private int port;
-    private String role;
-    private Master master;
-    private ReplicaClient client;
+    private final ServerNode serverNode;
+    private ReplicaClient replicaClient;
+    private MasterManager masterManager;
 
-    public Main() {}
+    public Main() {
+        this.serverNode = new ServerNode();
+    }
 
     public Main(int port) {
-        this.port = port;
+        this.serverNode = new ServerNode(port);
     }
 
     private void registerNewEnvVars(String[] args) {
@@ -66,7 +65,8 @@ public class Main {
 
     private void removeExpiredKeyFromLocalMap() {
         try {
-            while (this.serverSocket != null && !this.serverSocket.isClosed()) {
+            ServerSocket serverSocket = this.serverNode.getServerSocket();
+            while (serverSocket != null && !serverSocket.isClosed()) {
                 Long currentTime = System.currentTimeMillis();
                 List<String> cacheKey2Remove = getCacheKey2Remove(currentTime);
                 for (String key: cacheKey2Remove) {
@@ -79,7 +79,7 @@ public class Main {
         }
     }
 
-    private static List<String> getCacheKey2Remove(Long currentTime) {
+    private List<String> getCacheKey2Remove(Long currentTime) {
         List<String> cacheKey2Remove = new ArrayList<>();
         for(Map.Entry<String, Cache> cacheEntry: RedisLocalMap.LOCAL_MAP.entrySet()) {
             String key = cacheEntry.getKey();
@@ -99,14 +99,15 @@ public class Main {
         // Uncomment this block to pass the first stage
         try {
             // start redis-server
-            this.serverSocket = new ServerSocket(this.port);
+            ServerSocket serverSocket = new ServerSocket(this.serverNode.getPort());
+            this.serverNode.setServerSocket(serverSocket);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
-            this.serverSocket.setReuseAddress(true);
+            serverSocket.setReuseAddress(true);
             // init job to clean local map
             initCleanLocalMap();
             // Wait for connection from client.
-            while (!this.serverSocket.isClosed()) {
+            while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept(); // blocking
                 new Thread(() -> handleClientConnection(clientSocket)).start();
             }
@@ -114,6 +115,7 @@ public class Main {
             System.out.println("IOException: " + e.getMessage());
         } finally {
             try {
+                ServerSocket serverSocket = this.serverNode.getServerSocket();
                 if (serverSocket != null) {
                     serverSocket.close();
                 }
@@ -124,32 +126,41 @@ public class Main {
     }
 
     private void fillRedisServerInfo() {
-        this.port = this.port != 0 ? this.port : SystemPropHelper.getServerPortOrDefault();
-        this.role = SystemPropHelper.getSetServerRoleOrDefault();
-        this.master = SystemPropHelper.getServerMaster();
-        this.client = new ReplicaClient(this.master);
+        String serverNodeHost = SystemPropHelper.getServerHostOrDefault();
+        this.serverNode.setHost(serverNodeHost);
+
+        int serverNodePort = this.serverNode.getPort();
+        int newServerNodePort = serverNodePort != 0 ? serverNodePort : SystemPropHelper.getServerPortOrDefault();
+        this.serverNode.setPort(newServerNodePort);
+
+        String role = SystemPropHelper.getSetServerRoleOrDefault();
+        this.serverNode.setRole(role);
+
+        String id = ServerUtils.formatId(serverNodeHost, newServerNodePort);
+        this.serverNode.setId(id);
     }
 
     private void preCheck() {
         System.out.println("Pre-check if redis-server can be started");
-        if (!RoleType.MASTER.name().equalsIgnoreCase(this.role) && Objects.equals(this.port, OutputConstants.DEFAULT_REDIS_MASTER_SERVER_PORT)) {
+        String role = this.serverNode.getRole();
+        int port = this.serverNode.getPort();
+        if (!RoleType.MASTER.name().equalsIgnoreCase(role) && Objects.equals(port, OutputConstants.DEFAULT_REDIS_MASTER_SERVER_PORT)) {
             throw new RuntimeException("not allow non-master node to use default master port=6379");
         }
     }
 
-    private void handshake2Master() {
-        if (RoleType.MASTER.name().equalsIgnoreCase(this.role)) {
-            return;
+    private void handleReplicationHandshake() {
+        String role = this.serverNode.getRole();
+        if (RoleType.MASTER.name().equalsIgnoreCase(role)) {
+            this.masterManager = new MasterManager();
+        } else if (RoleType.SLAVE.name().equalsIgnoreCase(role)) {
+            MasterNode master = SystemPropHelper.getServerMaster();
+            this.replicaClient = new ReplicaClient(master);
+            this.replicaClient.handleReplicationHandshake();
         }
-        if (Objects.isNull(this.master) || Objects.isNull(this.master.getHost()) || this.master.getPort() <= 0) {
-            throw new RuntimeException("replica node is missing master's host or port");
-        }
-        this.client.connect2Master();
-        new Thread(this.client::listenHandshakeFromMaster).start();
-        this.client.sendHandshake2Master();
     }
 
-    private static void handleClientConnection(Socket clientSocket) {
+    private void handleClientConnection(Socket clientSocket) {
         try {
             // handle multiple commands from redis client
             while (!clientSocket.isClosed()) {
@@ -158,8 +169,10 @@ public class Main {
                 OutputStream outputStream = clientSocket.getOutputStream();
                 try {
                     if (!ans.isBlank()) {
+                        // attempt to write. If EOF or Broken pipeline, break the loop
                         outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
                         outputStream.flush();
+                        this.masterManager.transferEmptyRDBFile(ans, clientSocket);
                     }
                 } catch (IOException e) {
                     break;
@@ -180,6 +193,7 @@ public class Main {
 
   public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
+        // Below are only server node's operations
         System.out.println("Logs from your program will appear here! with " + Arrays.toString(args));
         Main main = new Main();
         main.registerNewEnvVars(args);
@@ -187,7 +201,7 @@ public class Main {
         main.registerRDB();
         main.fillRedisServerInfo();
         main.preCheck();
-        main.handshake2Master();
+        main.handleReplicationHandshake();
         main.startServerSocket();
   }
 }

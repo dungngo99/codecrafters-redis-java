@@ -1,7 +1,8 @@
-package client;
+package replication;
 
 import constants.OutputConstants;
-import dto.Master;
+import dto.MasterNode;
+import dto.ReplicaNode;
 import enums.Command;
 import service.RESPParser;
 import service.RESPUtils;
@@ -15,20 +16,31 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 public class ReplicaClient {
+
+    private ReplicaNode replicaNode;
     
-    private Socket replica2Master;
-    private Master master;
-    
-    public ReplicaClient(Master master) {
-        this.master = master;
-        this.replica2Master = null;
+    public ReplicaClient(MasterNode master) {
+        this.replicaNode = new ReplicaNode(master);
+    }
+
+    public void handleReplicationHandshake() {
+        MasterNode master = this.replicaNode.getMaster();
+        if (Objects.isNull(master) || Objects.isNull(master.getHost()) || master.getPort() <= 0) {
+            throw new RuntimeException("replica node is missing master's host or port");
+        }
+        this.connect2Master();
+        new Thread(this::listenHandshakeFromMaster).start();
+        this.sendHandshake2Master();
     }
     
     public void connect2Master() {
         try {
-            this.replica2Master = new Socket(this.master.getHost(), this.master.getPort());
+            MasterNode master = replicaNode.getMaster();
+            Socket replica2Master = new Socket(master.getHost(), master.getPort());
+            replicaNode.setReplica2Master(replica2Master);
         } catch (IOException e) {
             throw new RuntimeException("failed to connect to master from replica, ignore handshake");
         }
@@ -51,48 +63,48 @@ public class ReplicaClient {
     }
 
     protected void sendRespPING() {
+        Socket replica2Master = this.replicaNode.getReplica2Master();
         try {
-            OutputStream outputStream = this.replica2Master.getOutputStream();
+            OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(RESPUtils.getRESPPing().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
-            System.out.println("sent PING command to master");
         } catch(IOException | InterruptedException e) {
             throw new RuntimeException("failed to PING master node, ignore handshake", e);
         }
     }
 
     protected void sendRespListeningPort() {
+        Socket replica2Master = this.replicaNode.getReplica2Master();
         try {
-            OutputStream outputStream = this.replica2Master.getOutputStream();
+            OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfListeningPort().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
-            System.out.println("sent REPLCONF listening-port command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's listening port to master node, ignore handshake", e);
         }
     }
 
     protected void sendRespCapa() {
+        Socket replica2Master = this.replicaNode.getReplica2Master();
         try {
-            OutputStream outputStream = this.replica2Master.getOutputStream();
+            OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfCapa().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
-            System.out.println("sent REPLCONF capa psync2 command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's capa psync2 to master node, ignore handshake", e);
         }
     }
 
     protected void sendRespPsync() {
+        Socket replica2Master = this.replicaNode.getReplica2Master();
         try {
-            OutputStream outputStream = this.replica2Master.getOutputStream();
+            OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPPsync().getBytes(StandardCharsets.UTF_8));
             outputStream.flush();
             Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS); // temporary solution
-            System.out.println("send PSYNC command to master");
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("failed to send replica's psync to master node, ignore handshake", e);
         }
@@ -106,9 +118,10 @@ public class ReplicaClient {
     }
 
     public void listenHandshakeFromMaster() {
+        Socket replica2Master = this.replicaNode.getReplica2Master();
         try {
-            while (!this.replica2Master.isClosed()) {
-                RedisInputStream redisInputStream = new RedisInputStream(this.replica2Master.getInputStream(), 1000);
+            while (!replica2Master.isClosed()) {
+                RedisInputStream redisInputStream = new RedisInputStream(replica2Master.getInputStream(), 1000);
                 String ans = RESPParser.process(redisInputStream);
                 if (ans != null && !ans.isBlank()) {
                     System.out.println("received " + ans + " from master");

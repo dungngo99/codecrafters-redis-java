@@ -1,7 +1,6 @@
 package service;
 
 import constants.OutputConstants;
-import dto.Cache;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -22,6 +21,12 @@ public class RESPUtils {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
         joiner.add(OutputConstants.DOLLAR_SIZE + str.length());
         joiner.add(str);
+        return joiner.toString();
+    }
+
+    public static String toByteStreamWithCRLF(byte[] bytes) {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
+        joiner.add(OutputConstants.DOLLAR_SIZE + bytes.length);
         return joiner.toString();
     }
 

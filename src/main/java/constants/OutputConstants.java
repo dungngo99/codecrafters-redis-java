@@ -11,13 +11,13 @@ public class OutputConstants {
     public static final String PLUS = "+";
     public static final String EMPTY = "";
     public static final String DIR = "dir";
-    public static final String DIR_DEFAULT_VALUE = "/tmp/redis-files";
     public static final String DB_FILENAME = "dbfilename";
-    public static final String DB_FILENAME_DEFAULT_VALUE = "dump.rdb";
     public static final String KEYS_DELIMITER = "*";
     public static final String SPACE_DELIMITER = " ";
     public static final String REDIS_RDB_VERSION = "redis.rdb.version";
+    public static final String DEFAULT_REDSI_SERVER_HOST = "localhost";
     public static final int DEFAULT_REDIS_MASTER_SERVER_PORT = 6379;
+    public static final String REDIS_SERVER_HOST_KEY = "host";
     public static final String REDIS_SERVER_PORT_KEY = "port";
     public static final String REDIS_SERVER_ROLE_TYPE = "role";
     public static final String COLON_DELIMITER = ":";
@@ -31,4 +31,6 @@ public class OutputConstants {
     public static final String REPLICA_FULL_RESYNC = "FULLRESYNC";
     public static final String QUESTION_MARK = "?";
     public static final Integer THREAD_SLEEP_100_MILLIS = 100;
+    public static final String SERVER_NODE_ID_FORMAT = "%s::%s";
+    public static final String EMPTY_RDB_FILE_CONTENT_HEX = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
 }

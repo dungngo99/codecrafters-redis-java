@@ -31,7 +31,7 @@ public class RESPParser {
                 obj = "";
                 break;
             default:
-                throw new RuntimeException("error here");
+                throw new RuntimeException("unsupported RESP indicator b=" + b);
         }
         return convert(obj);
     }
