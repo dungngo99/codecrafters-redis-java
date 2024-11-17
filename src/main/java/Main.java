@@ -1,4 +1,5 @@
 import constants.ParserConstants;
+import dto.RESPResult;
 import dto.ServerNode;
 import replication.MasterManager;
 import replication.ReplicaClient;
@@ -11,7 +12,6 @@ import service.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -161,21 +161,13 @@ public class Main {
         try {
             // handle multiple commands from redis client
             while (!clientSocket.isClosed()) {
-                String ans = new RESPParser.Builder()
+                RESPResult result = new RESPParser.Builder()
                         .addClientSocket(clientSocket)
                         .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
                         .build()
                         .process();
                 try {
-                    if (!RESPUtils.isValidRESPResponse(ans)) {
-                        continue;
-                    }
-                    if (!ans.isBlank()) {
-                        OutputStream outputStream = clientSocket.getOutputStream();
-                        // attempt to write. If EOF or Broken pipeline, break the loop
-                        outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
-                        outputStream.flush();
-                    }
+                    RESPUtils.outputStreamPerRESPResult(result, clientSocket);
                 } catch (IOException e) {
                     break;
                 }

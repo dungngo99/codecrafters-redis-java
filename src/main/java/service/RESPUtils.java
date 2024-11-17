@@ -1,7 +1,14 @@
 package service;
 
 import constants.OutputConstants;
+import dto.RESPResult;
+import enums.RESPResultType;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -68,6 +75,21 @@ public class RESPUtils {
         return array;
     }
 
+    public static byte[] fromStringList(List<String> list) {
+        List<Byte> byteList = new ArrayList<>();
+        for (String str: list) {
+            byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+            for (byte b: bytes) {
+                byteList.add(b);
+            }
+        }
+        byte[] ans = new byte[byteList.size()];
+        for (int i=0; i<ans.length; i++) {
+            ans[i] = byteList.get(i);
+        }
+        return ans;
+    }
+
     public static byte[] combine2Bytes(byte[] b1, byte[] b2) {
         byte[] ans = new byte[b1.length + b2.length];
         for (int i=0; i<b1.length; i++) {
@@ -92,5 +114,33 @@ public class RESPUtils {
                 (resp.startsWith(OutputConstants.OK)
                         || resp.startsWith(OutputConstants.REPLICA_FULL_RESYNC)
                         || resp.startsWith(OutputConstants.PONG));
+    }
+
+    public static void outputStreamPerRESPResult(RESPResult result, Socket clientSocket) throws IOException {
+        if (!RESPResultType.shouldProcess(result.getType())) {
+            return;
+        }
+        RESPResultType type = result.getType();
+        List<String> list = result.getList();
+        if (Objects.equals(type, RESPResultType.STRING)) {
+            String ans = list.get(0);
+            if (!RESPUtils.isValidRESPResponse(ans)) {
+                return;
+            }
+            if (!ans.isBlank()) {
+                OutputStream outputStream = clientSocket.getOutputStream();
+                // attempt to write. If EOF or Broken pipeline, break the loop
+                outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
+            }
+        } else if (Objects.equals(type, RESPResultType.LIST)) {
+            byte[] bytes = fromStringList(list);
+            if (bytes.length > 0) {
+                OutputStream outputStream = clientSocket.getOutputStream();
+                // attempt to write. If EOF or Broken pipeline, break the loop
+                outputStream.write(bytes);
+                outputStream.flush();
+            }
+        }
     }
 }

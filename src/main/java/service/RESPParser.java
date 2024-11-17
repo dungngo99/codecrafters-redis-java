@@ -1,6 +1,8 @@
 package service;
 
+import dto.RESPResult;
 import enums.Command;
+import enums.RESPResultType;
 import handler.CommandHandler;
 import stream.RedisInputStream;
 
@@ -37,7 +39,28 @@ public class RESPParser {
         }
     }
 
-    public String process() throws IOException {
+    public RESPResult process() throws IOException {
+        List<String> list = new ArrayList<>();
+        while (true) {
+            String ans = process0();
+            if (ans == null || ans.isBlank()) {
+                break;
+            }
+            list.add(ans);
+        }
+        RESPResult result = new RESPResult();
+        result.setList(list);
+        if (list.isEmpty()) {
+            result.setType(RESPResultType.EMPTY);
+        } else if (list.size() == 1) {
+            result.setType(RESPResultType.STRING);
+        } else {
+            result.setType(RESPResultType.LIST);
+        }
+        return result;
+    }
+
+    public String process0() throws IOException {
         byte b = (byte) inputStream.read();
         Object obj;
         switch(b) {
@@ -97,7 +120,7 @@ public class RESPParser {
         inputStream.skipCRLF();
         List<Object> ans = new ArrayList<>(size);
         for (int i=0; i<size; i++) {
-            ans.add(process());
+            ans.add(process0());
         }
         return ans;
     }

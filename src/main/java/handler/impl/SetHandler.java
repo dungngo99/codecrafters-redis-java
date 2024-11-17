@@ -50,6 +50,6 @@ public class SetHandler implements CommandHandler {
         List<String> strings = new ArrayList<>();
         list.forEach(e -> strings.add((String) e));
         String command = RESPUtils.toArray(strings);
-        MasterManager.propagateCommand(command);
+        MasterManager.registerCommand(command);
     }
 }

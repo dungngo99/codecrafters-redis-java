@@ -10,6 +10,5 @@ public interface CommandHandler {
 
     void register();
     String process(Socket clientSocket, List list);
-
     default void propagate(List list) {}
 }

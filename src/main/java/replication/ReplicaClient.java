@@ -3,7 +3,9 @@ package replication;
 import constants.OutputConstants;
 import constants.ParserConstants;
 import dto.MasterNode;
+import dto.RESPResult;
 import enums.Command;
+import enums.RESPResultType;
 import service.RESPParser;
 import service.RESPUtils;
 import service.SystemPropHelper;
@@ -108,13 +110,18 @@ public class ReplicaClient {
     public static void listenHandshakeFromMaster() {
         try {
             while (!replica2Master.isClosed()) {
-                String ans = new RESPParser.Builder()
+                RESPResult result = new RESPParser.Builder()
                         .addClientSocket(replica2Master)
                         .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
                         .build()
                         .process();
-                if (ans != null && !ans.isBlank()) {
-                    handleClientSimpleString(ans);
+                if (!RESPResultType.shouldProcess(result.getType())) {
+                    return;
+                }
+                RESPResultType type = result.getType();
+                List<String> list = result.getList();
+                if (Objects.equals(type, RESPResultType.STRING)) {
+                    handleClientSimpleString(list.getFirst());
                 }
                 Thread.sleep(Duration.of(100, ChronoUnit.MICROS));
             }

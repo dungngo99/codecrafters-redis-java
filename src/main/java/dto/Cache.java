@@ -19,4 +19,12 @@ public class Cache {
     public void setExpireTime(Long expireTime) {
         this.expireTime = expireTime;
     }
+
+    @Override
+    public String toString() {
+        return "Cache{" +
+                "value='" + value + '\'' +
+                ", expireTime=" + expireTime +
+                '}';
+    }
 }
