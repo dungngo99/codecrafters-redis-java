@@ -1,14 +1,15 @@
 package handler.impl;
 
-import constants.OutputConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
+import replication.MasterManager;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class SetHandler implements CommandHandler {
     @Override
@@ -17,7 +18,7 @@ public class SetHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty() || list.size() < 2) {
             return "";
         }
@@ -39,5 +40,16 @@ public class SetHandler implements CommandHandler {
         }
         RedisLocalMap.LOCAL_MAP.put(key, cache);
         return RESPUtils.getRESPOk();
+    }
+
+    @Override
+    public void propagate(List list) {
+        if (list == null || list.isEmpty() || list.size() < 2) {
+            return;
+        }
+        List<String> strings = new ArrayList<>();
+        list.forEach(e -> strings.add((String) e));
+        String command = RESPUtils.toArray(strings);
+        MasterManager.propagateCommand(command);
     }
 }

@@ -7,9 +7,9 @@ import handler.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
+import java.net.Socket;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class KeysHandler implements CommandHandler {
 
@@ -19,7 +19,7 @@ public class KeysHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
             return "";
         }
@@ -29,7 +29,7 @@ public class KeysHandler implements CommandHandler {
             return "";
         }
         if (ffix.size() == 1) {
-            return handleSingleKey(ffix);
+            return handleSingleKey(clientSocket, ffix);
         }
         if (ffix.size() == 2) {
             return handlePreSuffix(ffix);
@@ -48,8 +48,8 @@ public class KeysHandler implements CommandHandler {
         return List.of(str.substring(0, i), str.substring(i+1));
     }
 
-    private String handleSingleKey(List<String> ffix) {
-        return CommandHandler.HANDLER_MAP.get(Command.GET.name().toLowerCase()).process(ffix);
+    private String handleSingleKey(Socket clientSocket, List<String> ffix) {
+        return CommandHandler.HANDLER_MAP.get(Command.GET.name().toLowerCase()).process(clientSocket, ffix);
     }
 
     private String handlePreSuffix(List<String> ffix) {

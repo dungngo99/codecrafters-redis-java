@@ -1,5 +1,6 @@
 package handler;
 
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,5 +9,7 @@ public interface CommandHandler {
     Map<String, CommandHandler> HANDLER_MAP = new HashMap<>();
 
     void register();
-    String process(List list);
+    String process(Socket clientSocket, List list);
+
+    default void propagate(List list) {}
 }

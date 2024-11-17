@@ -1,4 +1,4 @@
-import dto.MasterNode;
+import constants.ParserConstants;
 import dto.ServerNode;
 import replication.MasterManager;
 import replication.ReplicaClient;
@@ -7,7 +7,6 @@ import dto.Cache;
 import enums.RoleType;
 import handler.impl.*;
 import service.*;
-import stream.RedisInputStream;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -19,8 +18,6 @@ import java.util.*;
 
 public class Main {
     private final ServerNode serverNode;
-    private ReplicaClient replicaClient;
-    private MasterManager masterManager;
 
     public Main() {
         this.serverNode = new ServerNode();
@@ -136,7 +133,7 @@ public class Main {
         String role = SystemPropHelper.getSetServerRoleOrDefault();
         this.serverNode.setRole(role);
 
-        String id = ServerUtils.formatId(serverNodeHost, newServerNodePort);
+        String id = SystemPropHelper.getSetMasterNodeId();
         this.serverNode.setId(id);
     }
 
@@ -152,11 +149,11 @@ public class Main {
     private void handleReplicationHandshake() {
         String role = this.serverNode.getRole();
         if (RoleType.MASTER.name().equalsIgnoreCase(role)) {
-            this.masterManager = new MasterManager();
+            MasterManager.registerMasterManager(this.serverNode.getId(), this.serverNode.getHost(), this.serverNode.getPort());
+            MasterManager.registerPropagateTaskHandler(this.serverNode.getId());
         } else if (RoleType.SLAVE.name().equalsIgnoreCase(role)) {
-            MasterNode master = SystemPropHelper.getServerMaster();
-            this.replicaClient = new ReplicaClient(master);
-            this.replicaClient.handleReplicationHandshake();
+            ReplicaClient.connect2Master();
+            ReplicaClient.handleReplicationHandshake();
         }
     }
 
@@ -164,17 +161,20 @@ public class Main {
         try {
             // handle multiple commands from redis client
             while (!clientSocket.isClosed()) {
-                RedisInputStream redisInputStream = new RedisInputStream(clientSocket.getInputStream(), 1000);
-                String ans = RESPParser.process(redisInputStream);
-                OutputStream outputStream = clientSocket.getOutputStream();
+                String ans = new RESPParser.Builder()
+                        .addClientSocket(clientSocket)
+                        .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
+                        .build()
+                        .process();
                 try {
+                    if (!RESPUtils.isValidRESPResponse(ans)) {
+                        continue;
+                    }
                     if (!ans.isBlank()) {
+                        OutputStream outputStream = clientSocket.getOutputStream();
                         // attempt to write. If EOF or Broken pipeline, break the loop
                         outputStream.write(ans.getBytes(StandardCharsets.UTF_8));
                         outputStream.flush();
-                    }
-                    if (this.masterManager != null) {
-                        this.masterManager.transferEmptyRDBFile(ans, clientSocket);
                     }
                 } catch (IOException e) {
                     break;

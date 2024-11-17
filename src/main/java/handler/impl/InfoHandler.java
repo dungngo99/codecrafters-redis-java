@@ -6,6 +6,7 @@ import handler.CommandHandler;
 import service.RESPUtils;
 import service.SystemPropHelper;
 
+import java.net.Socket;
 import java.util.*;
 import java.util.function.Function;
 
@@ -22,7 +23,7 @@ public class InfoHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
             throw new RuntimeException("invalid param");
         }

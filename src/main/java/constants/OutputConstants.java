@@ -24,6 +24,7 @@ public class OutputConstants {
     public static final String REDIS_SERVER_REPLICA_OF = "replicaof";
     public static final int MASTER_REPLID_LENGTH = 40;
     public static final String MASTER_REPLID = "master_replid";
+    public static final String MASTER_NODE_ID = "master_node_id";
     public static final int MASTER_REPL_OFFSET_DEFAULT = 0;
     public static final String MASTER_REPL_OFFSET = "master_repl_offset";
     public static final Integer RESP_PING_ARRAY_LENGTH = 1;
@@ -31,6 +32,7 @@ public class OutputConstants {
     public static final String REPLICA_FULL_RESYNC = "FULLRESYNC";
     public static final String QUESTION_MARK = "?";
     public static final Integer THREAD_SLEEP_100_MILLIS = 100;
+    public static final Integer THREAD_SLEEP_1_SECOND = 1000;
     public static final String SERVER_NODE_ID_FORMAT = "%s::%s";
     public static final String EMPTY_RDB_FILE_CONTENT_HEX = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
 }

@@ -4,6 +4,7 @@ import enums.Command;
 import handler.CommandHandler;
 import service.RESPUtils;
 
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class ReplConfigHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.size() < 2) {
             throw new RuntimeException("invalid param");
         }

@@ -1,26 +1,33 @@
 package dto;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.Socket;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MasterNode extends ServerNode {
 
-    private Map<String, ReplicaNode> replicaNodeMap;
-
-    public MasterNode() {
-        this.replicaNodeMap = new HashMap<>();
-    }
+    private List<Socket> replicaNodeSocketList;
+    public ConcurrentLinkedQueue<PropagateTask> taskQueue;
 
     public MasterNode(String host, int port) {
         super(host, port);
-        this.replicaNodeMap = new HashMap<>();
+        replicaNodeSocketList = new ArrayList<>();
+        this.taskQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public Map<String, ReplicaNode> getReplicaNodeMap() {
-        return replicaNodeMap;
+    public List<Socket> getReplicaNodeSocketList() {
+        return replicaNodeSocketList;
     }
 
-    public void setReplicaNodeMap(Map<String, ReplicaNode> replicaNodeMap) {
-        this.replicaNodeMap = replicaNodeMap;
+    public void setReplicaNodeSocketList(List<Socket> replicaNodeSocketList) {
+        this.replicaNodeSocketList = replicaNodeSocketList;
+    }
+
+    public ConcurrentLinkedQueue<PropagateTask> getTaskQueue() {
+        return taskQueue;
+    }
+
+    public void setTaskQueue(ConcurrentLinkedQueue<PropagateTask> taskQueue) {
+        this.taskQueue = taskQueue;
     }
 }

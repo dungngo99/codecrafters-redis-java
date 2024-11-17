@@ -1,14 +1,13 @@
 package handler.impl;
 
-import constants.OutputConstants;
 import dto.Cache;
 import enums.Command;
 import handler.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
+import java.net.Socket;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class GetHandler implements CommandHandler {
     @Override
@@ -17,7 +16,7 @@ public class GetHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
             return "";
         }

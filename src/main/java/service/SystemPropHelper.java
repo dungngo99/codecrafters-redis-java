@@ -57,4 +57,18 @@ public class SystemPropHelper {
         setNewEnvProperty(OutputConstants.MASTER_REPLID, value);
         return value;
     }
+
+    /**
+     * @see #getSetMasterReplId() as alias
+     * @return master node ID
+     */
+    public static String getSetMasterNodeId() {
+        String value = System.getProperty(OutputConstants.MASTER_NODE_ID);
+        if (Objects.nonNull(value)) {
+            return value;
+        }
+        value = getSetMasterReplId();
+        setNewEnvProperty(OutputConstants.MASTER_NODE_ID, value);
+        return value;
+    }
 }

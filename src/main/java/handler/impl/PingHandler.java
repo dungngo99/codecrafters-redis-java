@@ -5,8 +5,8 @@ import enums.Command;
 import handler.CommandHandler;
 import service.RESPUtils;
 
+import java.net.Socket;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class PingHandler implements CommandHandler {
 
@@ -16,7 +16,7 @@ public class PingHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         return RESPUtils.toSimpleString(OutputConstants.PONG);
     }
 }

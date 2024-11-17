@@ -1,13 +1,12 @@
 package replication;
 
 import constants.OutputConstants;
+import constants.ParserConstants;
 import dto.MasterNode;
-import dto.ReplicaNode;
 import enums.Command;
 import service.RESPParser;
 import service.RESPUtils;
 import service.SystemPropHelper;
-import stream.RedisInputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,29 +19,22 @@ import java.util.Objects;
 
 public class ReplicaClient {
 
-    private ReplicaNode replicaNode;
-    
-    public ReplicaClient(MasterNode master) {
-        this.replicaNode = new ReplicaNode(master);
-    }
+    private static Socket replica2Master;
 
-    public void handleReplicationHandshake() {
-        MasterNode master = this.replicaNode.getMaster();
-        if (Objects.isNull(master) || Objects.isNull(master.getHost()) || master.getPort() <= 0) {
-            throw new RuntimeException("replica node is missing master's host or port");
-        }
-        this.connect2Master();
-        new Thread(this::listenHandshakeFromMaster).start();
-        this.sendHandshake2Master();
+    public static void handleReplicationHandshake() {
+        new Thread(ReplicaClient::listenHandshakeFromMaster).start();
+        ReplicaClient.sendHandshake2Master();
     }
     
-    public void connect2Master() {
+    public static void connect2Master() {
         try {
-            MasterNode master = replicaNode.getMaster();
-            Socket replica2Master = new Socket(master.getHost(), master.getPort());
-            replicaNode.setReplica2Master(replica2Master);
-        } catch (IOException e) {
-            throw new RuntimeException("failed to connect to master from replica, ignore handshake");
+            MasterNode master = SystemPropHelper.getServerMaster();
+            if (Objects.isNull(master) || Objects.isNull(master.getHost()) || master.getPort() <= 0) {
+                throw new RuntimeException("replica node is missing master's host or port");
+            }
+            replica2Master = new Socket(master.getHost(), master.getPort());
+        } catch (Exception e) {
+            throw new RuntimeException("failed to connect to master from replica, ignore handshake due to " + e.getMessage());
         }
     }
 
@@ -62,8 +54,7 @@ public class ReplicaClient {
         return RESPUtils.toArray(list);
     }
 
-    protected void sendRespPING() {
-        Socket replica2Master = this.replicaNode.getReplica2Master();
+    protected static void sendRespPING() {
         try {
             OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(RESPUtils.getRESPPing().getBytes(StandardCharsets.UTF_8));
@@ -74,8 +65,7 @@ public class ReplicaClient {
         }
     }
 
-    protected void sendRespListeningPort() {
-        Socket replica2Master = this.replicaNode.getReplica2Master();
+    protected static void sendRespListeningPort() {
         try {
             OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfListeningPort().getBytes(StandardCharsets.UTF_8));
@@ -86,8 +76,7 @@ public class ReplicaClient {
         }
     }
 
-    protected void sendRespCapa() {
-        Socket replica2Master = this.replicaNode.getReplica2Master();
+    protected static void sendRespCapa() {
         try {
             OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPReplConfCapa().getBytes(StandardCharsets.UTF_8));
@@ -98,8 +87,7 @@ public class ReplicaClient {
         }
     }
 
-    protected void sendRespPsync() {
-        Socket replica2Master = this.replicaNode.getReplica2Master();
+    protected static void sendRespPsync() {
         try {
             OutputStream outputStream = replica2Master.getOutputStream();
             outputStream.write(ReplicaClient.getRESPPsync().getBytes(StandardCharsets.UTF_8));
@@ -110,26 +98,40 @@ public class ReplicaClient {
         }
     }
 
-    public void sendHandshake2Master() {
+    public static void sendHandshake2Master() {
         sendRespPING();
         sendRespListeningPort();
         sendRespCapa();
         sendRespPsync();
     }
 
-    public void listenHandshakeFromMaster() {
-        Socket replica2Master = this.replicaNode.getReplica2Master();
+    public static void listenHandshakeFromMaster() {
         try {
             while (!replica2Master.isClosed()) {
-                RedisInputStream redisInputStream = new RedisInputStream(replica2Master.getInputStream(), 1000);
-                String ans = RESPParser.process(redisInputStream);
+                String ans = new RESPParser.Builder()
+                        .addClientSocket(replica2Master)
+                        .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
+                        .build()
+                        .process();
                 if (ans != null && !ans.isBlank()) {
-                    System.out.println("received " + ans + " from master");
+                    handleClientSimpleString(ans);
                 }
                 Thread.sleep(Duration.of(100, ChronoUnit.MICROS));
             }
         } catch (IOException | InterruptedException | RuntimeException e) {
             System.out.println("failed to receive answer from master due to " + e.getMessage());
+        }
+    }
+
+    private static void handleClientSimpleString(String string) {
+        if (RESPUtils.isValidHandshakeReplicationSimpleString(string)) {
+            System.out.println("received " + string + " from master");
+            // proxy to specific handler
+            return;
+        }
+        if (RESPUtils.isValidRESPResponse(string)) {
+            System.out.println("recorded " + string.substring(0,3) + " after command from master");
+            return;
         }
     }
 }

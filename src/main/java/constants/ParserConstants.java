@@ -18,6 +18,7 @@ public class ParserConstants {
     public static final int MASK_TO_8_BIT_INT = 0xff;
     public static final String REDIS_RDB_DB_ID = "db.id";
     public static final int SC_TO_MS_VALUE_CONVERTER = 1000;
+    public static final Integer RESP_PARSER_BUFFER_SIZE = 1000;
 
     // REDIS RDB SECTION INDICATOR
     public static final int REDIS_RDB_OPCODE_MODULE_AUX = 247;

@@ -1,12 +1,11 @@
 package handler.impl;
 
-import constants.OutputConstants;
 import enums.Command;
 import handler.CommandHandler;
 import service.RESPUtils;
 
+import java.net.Socket;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class EchoHandler implements CommandHandler {
     @Override
@@ -15,7 +14,7 @@ public class EchoHandler implements CommandHandler {
     }
 
     @Override
-    public String process(List list) {
+    public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
             return "";
         }
