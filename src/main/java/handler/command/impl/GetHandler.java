@@ -1,8 +1,8 @@
-package handler.impl;
+package handler.command.impl;
 
-import dto.Cache;
-import enums.Command;
-import handler.CommandHandler;
+import dto.CacheDto;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class GetHandler implements CommandHandler {
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.GET.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.GET.name().toLowerCase(), this);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class GetHandler implements CommandHandler {
         if (!RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             return RESPUtils.getBulkNull();
         } else {
-            Cache cache = RedisLocalMap.LOCAL_MAP.get(key);
+            CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
             String value = cache.getValue();
             return RESPUtils.toBulkString(value);
         }

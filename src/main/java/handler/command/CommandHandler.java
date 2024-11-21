@@ -1,4 +1,4 @@
-package handler;
+package handler.command;
 
 import java.net.Socket;
 import java.util.HashMap;

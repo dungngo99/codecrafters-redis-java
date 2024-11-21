@@ -1,34 +1,34 @@
 package replication;
 
 import constants.OutputConstants;
-import dto.MasterNode;
-import dto.PropagateTask;
+import dto.MasterNodeDto;
+import dto.TaskDto;
+import enums.JobType;
+import handler.job.impl.PropagateHandler;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import service.RESPUtils;
+import service.ServerUtils;
 import service.SystemPropHelper;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MasterManager {
 
-    private static final Map<String, MasterNode> MASTER_NODE_MAP = new HashMap<>();
+    private static final Map<String, MasterNodeDto> MASTER_NODE_MAP = new HashMap<>();
 
     public static void registerReplicaNodeConnection(Socket socket) {
         if (socket == null) {
             return;
         }
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
-        MasterNode masterNode = MASTER_NODE_MAP.get(masterNodeId);
+        MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
         if (masterNode == null) {
             return;
         }
@@ -36,55 +36,24 @@ public class MasterManager {
     }
 
     public static void registerMasterManager(String masterNodeId, String host, int port) {
-        MASTER_NODE_MAP.put(masterNodeId, new MasterNode(host, port));
+        MASTER_NODE_MAP.put(masterNodeId, new MasterNodeDto(host, port));
     }
 
-    public static void registerPropagateTaskHandler(String masterNodeId) {
-        MasterNode masterNode = MASTER_NODE_MAP.get(masterNodeId);
-        if (masterNode == null) {
-            return;
-        }
-        new Thread(() -> MasterManager.registerPropagateTaskHandler0(masterNode)).start();
-    }
-
-    private static void registerPropagateTaskHandler0(MasterNode masterNode) {
-        try {
-            while (true) {
-                ConcurrentLinkedQueue<PropagateTask> taskQueue = masterNode.getTaskQueue();
-                if (!taskQueue.isEmpty()) {
-                    PropagateTask task = taskQueue.poll();
-                    System.out.println("begin to propagate task=" + task);
-                    Socket socket = task.getSocket();
-                    String command = task.getCommand();
-                    OutputStream outputStream = socket.getOutputStream();
-                    outputStream.write(command.getBytes(StandardCharsets.UTF_8));
-                    outputStream.flush();
-                }
-                Thread.sleep(Duration.of(100, ChronoUnit.MICROS));
-            }
-        } catch(IOException | InterruptedException e) {
-            System.out.println("failed to run propagate task handler due to " + e.getMessage());
-        }
-    }
-
-    public static void transferEmptyRDBFile(Socket clientSocket) throws IOException, InterruptedException {
-        if (clientSocket == null) {
-            return;
-        }
+    public static byte[] getTransferEmptyRDBFile() {
         byte[] bytes;
         try {
             bytes = Hex.decodeHex(OutputConstants.EMPTY_RDB_FILE_CONTENT_HEX);
         } catch(DecoderException e) {
-            System.out.println("failed to transfer empty rdb file, ignore transfering");
-            return;
+            System.out.println("failed to transfer empty rdb file, ignore transferring");
+            return null;
         }
-        Thread.sleep(OutputConstants.THREAD_SLEEP_100_MILLIS);
         String emptyRDBPrefix = RESPUtils.toByteStreamWithCRLF(bytes);
-        OutputStream outputStream = clientSocket.getOutputStream();
         byte[] prefixBytes = emptyRDBPrefix.getBytes(StandardCharsets.UTF_8);
-        byte[] finalBytes = RESPUtils.combine2Bytes(prefixBytes, bytes);
-        outputStream.write(finalBytes);
-        outputStream.flush();
+        return RESPUtils.combine2Bytes(prefixBytes, bytes);
+    }
+
+    public static String getRequestACKFromReplica() {
+        return RESPUtils.requestRESPReplConfAck();
     }
 
     /**
@@ -93,7 +62,7 @@ public class MasterManager {
      */
     public static void registerCommand(String command) {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
-        MasterNode masterNode = MASTER_NODE_MAP.get(masterNodeId);
+        MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
         if (masterNode == null) {
             return;
         }
@@ -101,10 +70,14 @@ public class MasterManager {
             if (Objects.isNull(socket)) {
                 continue;
             }
-            PropagateTask task = new PropagateTask();
-            task.setSocket(socket);
-            task.setCommand(command);
-            masterNode.getTaskQueue().add(task);
+            String jobId = ServerUtils.formatIdFromSocket(socket);
+            TaskDto taskDto = new TaskDto.Builder()
+                    .addSocket(socket)
+                    .addCommandStr(command)
+                    .addJobType(JobType.PROPAGATE)
+                    .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
+                    .build();
+            PropagateHandler.registerTask(jobId, taskDto);
         }
     }
 
@@ -114,7 +87,7 @@ public class MasterManager {
      */
     public static void propagateCommand(String command) {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
-        MasterNode masterNode = MASTER_NODE_MAP.get(masterNodeId);
+        MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
         if (masterNode == null) {
             return;
         }

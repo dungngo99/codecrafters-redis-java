@@ -2,7 +2,7 @@ package dto;
 
 import java.net.ServerSocket;
 
-public class ServerNode {
+public class ServerNodeDto {
 
     private String id;
     private ServerSocket serverSocket;
@@ -10,15 +10,15 @@ public class ServerNode {
     private int port;
     private String role;
 
-    public ServerNode() {
+    public ServerNodeDto() {
 
     }
 
-    public ServerNode(int port) {
+    public ServerNodeDto(int port) {
         this.port = port;
     }
 
-    public ServerNode(String host, int port) {
+    public ServerNodeDto(String host, int port) {
         this.host = host;
         this.port = port;
     }

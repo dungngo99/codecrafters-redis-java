@@ -1,6 +1,6 @@
 package dto;
 
-public class Cache {
+public class CacheDto {
     private String value;
     private Long expireTime;
 

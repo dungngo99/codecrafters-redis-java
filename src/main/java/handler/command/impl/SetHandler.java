@@ -1,8 +1,8 @@
-package handler.impl;
+package handler.command.impl;
 
-import dto.Cache;
-import enums.Command;
-import handler.CommandHandler;
+import dto.CacheDto;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import replication.MasterManager;
 import service.RESPUtils;
 import service.RedisLocalMap;
@@ -14,7 +14,7 @@ import java.util.List;
 public class SetHandler implements CommandHandler {
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.SET.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.SET.name().toLowerCase(), this);
     }
 
     @Override
@@ -28,12 +28,12 @@ public class SetHandler implements CommandHandler {
         Long expiry = null;
         if (list.size() > 2) {
             String px = (String) list.get(2);
-            if (Command.PX.name().toLowerCase().equalsIgnoreCase(px)) {
+            if (CommandType.PX.name().toLowerCase().equalsIgnoreCase(px)) {
                 expiry = Long.parseLong((String) list.get(3));
             }
         }
 
-        Cache cache = new Cache();
+        CacheDto cache = new CacheDto();
         cache.setValue((String) value);
         if (expiry != null) {
             cache.setExpireTime(System.currentTimeMillis() + expiry);

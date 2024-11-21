@@ -1,8 +1,8 @@
-package handler.impl;
+package handler.command.impl;
 
 import constants.OutputConstants;
-import enums.Command;
-import handler.CommandHandler;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RESPUtils;
 
 import java.net.Socket;
@@ -12,7 +12,7 @@ public class PingHandler implements CommandHandler {
 
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.PING.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.PING.name().toLowerCase(), this);
     }
 
     @Override

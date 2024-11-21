@@ -1,8 +1,8 @@
-package handler.impl;
+package handler.command.impl;
 
 import constants.OutputConstants;
-import enums.Command;
-import handler.CommandHandler;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RESPUtils;
 
 import java.net.Socket;
@@ -17,9 +17,9 @@ public class ConfigHandler implements CommandHandler {
 
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.CONFIG.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.CONFIG.name().toLowerCase(), this);
         SUB_COMMANDS.put(
-                Command.GET.name().toLowerCase(), this::handleGet
+                CommandType.GET.name().toLowerCase(), this::handleGet
         );
     }
 

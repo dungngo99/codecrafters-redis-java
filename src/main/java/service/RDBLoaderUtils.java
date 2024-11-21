@@ -1,7 +1,7 @@
 package service;
 
 import constants.OutputConstants;
-import dto.Cache;
+import dto.CacheDto;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class RDBLoaderUtils {
         if (key == null || key.isBlank() || value == null || value.length == 0) {
             return;
         }
-        Cache cache = new Cache();
+        CacheDto cache = new CacheDto();
         cache.setValue(value[0]);
         if (value.length == 2) {
             cache.setExpireTime(Long.parseLong(value[1]));

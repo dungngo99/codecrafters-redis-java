@@ -2,7 +2,7 @@ package dto;
 
 import enums.ExpiryType;
 
-public class KV {
+public class KVDto {
 
     private ExpiryType expiryType;
     private Long expiryTime;

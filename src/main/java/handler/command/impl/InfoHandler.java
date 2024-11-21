@@ -1,8 +1,8 @@
-package handler.impl;
+package handler.command.impl;
 
 import constants.OutputConstants;
-import enums.Command;
-import handler.CommandHandler;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RESPUtils;
 import service.SystemPropHelper;
 
@@ -16,9 +16,9 @@ public class InfoHandler implements CommandHandler {
 
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.INFO.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.INFO.name().toLowerCase(), this);
         SUB_COMMANDS.put(
-                Command.REPLICATION.name().toLowerCase(), this::processReplication
+                CommandType.REPLICATION.name().toLowerCase(), this::processReplication
         );
     }
 

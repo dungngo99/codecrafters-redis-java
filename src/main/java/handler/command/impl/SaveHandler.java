@@ -1,7 +1,7 @@
-package handler.impl;
+package handler.command.impl;
 
-import enums.Command;
-import handler.CommandHandler;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RDBLoaderUtils;
 import service.RESPUtils;
 
@@ -12,7 +12,7 @@ public class SaveHandler implements CommandHandler {
 
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.SAVE.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.SAVE.name().toLowerCase(), this);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class SaveHandler implements CommandHandler {
             return "";
         }
         String command = (String) list.get(0);
-        if (!Command.SAVE.name().equalsIgnoreCase(command)) {
+        if (!CommandType.SAVE.name().equalsIgnoreCase(command)) {
             return "";
         }
         RDBLoaderUtils.load();

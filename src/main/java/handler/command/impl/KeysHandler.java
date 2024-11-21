@@ -1,9 +1,9 @@
-package handler.impl;
+package handler.command.impl;
 
 import constants.OutputConstants;
-import dto.Cache;
-import enums.Command;
-import handler.CommandHandler;
+import dto.CacheDto;
+import enums.CommandType;
+import handler.command.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
@@ -15,7 +15,7 @@ public class KeysHandler implements CommandHandler {
 
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(Command.KEYS.name().toLowerCase(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.KEYS.name().toLowerCase(), this);
     }
 
     @Override
@@ -49,13 +49,13 @@ public class KeysHandler implements CommandHandler {
     }
 
     private String handleSingleKey(Socket clientSocket, List<String> ffix) {
-        return CommandHandler.HANDLER_MAP.get(Command.GET.name().toLowerCase()).process(clientSocket, ffix);
+        return CommandHandler.HANDLER_MAP.get(CommandType.GET.name().toLowerCase()).process(clientSocket, ffix);
     }
 
     private String handlePreSuffix(List<String> ffix) {
         String prefix = ffix.get(0);
         String suffix = ffix.get(1);
-        List<Map.Entry<String, Cache>> caches = RedisLocalMap.LOCAL_MAP.entrySet().stream().toList();
+        List<Map.Entry<String, CacheDto>> caches = RedisLocalMap.LOCAL_MAP.entrySet().stream().toList();
         if (!prefix.isBlank()) {
             caches = caches.stream()
                     .filter(e -> e.getKey().startsWith(prefix))

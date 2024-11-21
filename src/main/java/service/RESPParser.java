@@ -1,9 +1,9 @@
 package service;
 
-import dto.RESPResult;
-import enums.Command;
+import dto.RESPResultDto;
+import enums.CommandType;
 import enums.RESPResultType;
-import handler.CommandHandler;
+import handler.command.CommandHandler;
 import stream.RedisInputStream;
 
 import java.io.IOException;
@@ -39,17 +39,18 @@ public class RESPParser {
         }
     }
 
-    public RESPResult process() throws IOException {
+    public RESPResultDto process() throws IOException {
         List<String> list = new ArrayList<>();
         while (true) {
             String ans = process0();
-            if (ans == null || ans.isBlank()) {
+            if (ans == null || ans.isEmpty()) {
                 break;
             }
             list.add(ans);
         }
-        RESPResult result = new RESPResult();
+        RESPResultDto result = new RESPResultDto();
         result.setList(list);
+        result.setSocket(clientSocket);
         if (list.isEmpty()) {
             result.setType(RESPResultType.EMPTY);
         } else if (list.size() == 1) {
@@ -106,13 +107,13 @@ public class RESPParser {
         if (commandHandler == null) {
             return "";
         }
-        Command command = Command.fromAlias(alias);
+        CommandType command = CommandType.fromAlias(alias);
         List args = list.subList(1, list.size());
         String val = commandHandler.process(clientSocket, args);
         if (command != null && command.isWrite()) {
             new Thread(() -> commandHandler.propagate(list)).start();
         }
-        return val != null && !val.isBlank() ? val : RESPUtils.getBulkNull();
+        return val != null ? val : RESPUtils.getBulkNull();
     }
 
     private List<Object> processNextArray() throws IOException {

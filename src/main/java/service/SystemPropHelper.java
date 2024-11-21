@@ -1,7 +1,7 @@
 package service;
 
 import constants.OutputConstants;
-import dto.MasterNode;
+import dto.MasterNodeDto;
 import enums.RoleType;
 
 import java.util.Objects;
@@ -36,7 +36,7 @@ public class SystemPropHelper {
         return System.getProperty(OutputConstants.REDIS_SERVER_ROLE_TYPE);
     }
 
-    public static MasterNode getServerMaster() {
+    public static MasterNodeDto getServerMaster() {
         String masterVal = System.getProperty(OutputConstants.REDIS_SERVER_REPLICA_OF);
         if (Objects.isNull(masterVal) || masterVal.isEmpty()) {
             return null;
@@ -45,7 +45,7 @@ public class SystemPropHelper {
         if (masterValues.length < 2) {
             return null;
         }
-        return new MasterNode(masterValues[0], Integer.parseInt(masterValues[1]));
+        return new MasterNodeDto(masterValues[0], Integer.parseInt(masterValues[1]));
     }
 
     public static String getSetMasterReplId() {

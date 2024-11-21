@@ -13,9 +13,9 @@ public class RandomUtils {
     public static final String LOWER_ALPHANUMERICS = LOWER_STRING + DIGITS;
 
     private static class Random {
-        private int length;
-        private char[] symbols;
-        private SecureRandom random;
+        private final int length;
+        private final char[] symbols;
+        private final SecureRandom random;
 
         public Random(int length, String symbols, SecureRandom random) {
             this.length = length;

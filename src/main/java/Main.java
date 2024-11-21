@@ -1,12 +1,15 @@
 import constants.ParserConstants;
-import dto.RESPResult;
-import dto.ServerNode;
+import dto.JobDto;
+import dto.RESPResultDto;
+import dto.ServerNodeDto;
+import enums.JobType;
+import handler.job.impl.RespHandler;
 import replication.MasterManager;
 import replication.ReplicaClient;
 import constants.OutputConstants;
-import dto.Cache;
+import dto.CacheDto;
 import enums.RoleType;
-import handler.impl.*;
+import handler.command.impl.*;
 import service.*;
 
 import java.io.*;
@@ -17,14 +20,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Main {
-    private final ServerNode serverNode;
+    private final ServerNodeDto serverNode;
 
     public Main() {
-        this.serverNode = new ServerNode();
+        this.serverNode = new ServerNodeDto();
     }
 
     public Main(int port) {
-        this.serverNode = new ServerNode(port);
+        this.serverNode = new ServerNodeDto(port);
     }
 
     private void registerNewEnvVars(String[] args) {
@@ -78,9 +81,9 @@ public class Main {
 
     private List<String> getCacheKey2Remove(Long currentTime) {
         List<String> cacheKey2Remove = new ArrayList<>();
-        for(Map.Entry<String, Cache> cacheEntry: RedisLocalMap.LOCAL_MAP.entrySet()) {
+        for(Map.Entry<String, CacheDto> cacheEntry: RedisLocalMap.LOCAL_MAP.entrySet()) {
             String key = cacheEntry.getKey();
-            Cache cache = cacheEntry.getValue();
+            CacheDto cache = cacheEntry.getValue();
             Long expireTime = cache.getExpireTime();
             if (expireTime == null) {
                 continue;
@@ -106,10 +109,15 @@ public class Main {
             // Wait for connection from client.
             while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept(); // blocking
-                new Thread(() -> handleClientConnection(clientSocket)).start();
+                JobDto jobDto = new JobDto.Builder(JobType.RESP)
+                        .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
+                        .addSocket(clientSocket)
+                        .addTaskQueue()
+                        .build();
+                new RespHandler().registerJob(jobDto);
             }
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            System.out.printf("IOException: %s\n", e.getMessage());
         } finally {
             try {
                 ServerSocket serverSocket = this.serverNode.getServerSocket();
@@ -117,7 +125,7 @@ public class Main {
                     serverSocket.close();
                 }
             } catch (IOException e) {
-                System.out.println("IOException: " + e.getMessage());
+                System.out.printf("IOException: %s\n", e.getMessage());
             }
         }
     }
@@ -150,45 +158,16 @@ public class Main {
         String role = this.serverNode.getRole();
         if (RoleType.MASTER.name().equalsIgnoreCase(role)) {
             MasterManager.registerMasterManager(this.serverNode.getId(), this.serverNode.getHost(), this.serverNode.getPort());
-            MasterManager.registerPropagateTaskHandler(this.serverNode.getId());
         } else if (RoleType.SLAVE.name().equalsIgnoreCase(role)) {
             ReplicaClient.connect2Master();
             ReplicaClient.handleReplicationHandshake();
         }
     }
 
-    private void handleClientConnection(Socket clientSocket) {
-        try {
-            // handle multiple commands from redis client
-            while (!clientSocket.isClosed()) {
-                RESPResult result = new RESPParser.Builder()
-                        .addClientSocket(clientSocket)
-                        .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
-                        .build()
-                        .process();
-                try {
-                    RESPUtils.outputStreamPerRESPResult(result, clientSocket);
-                } catch (IOException e) {
-                    break;
-                }
-                Thread.sleep(Duration.of(100, ChronoUnit.MICROS));
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            try {
-                if (!clientSocket.isClosed()) {
-                    clientSocket.close();
-                }
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            }
-        }
-    }
-
   public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         // Below are only server node's operations
-        System.out.println("Logs from your program will appear here! with " + Arrays.toString(args));
+        System.out.printf("Logs from your program will appear here! with %s \n", Arrays.toString(args));
         Main main = new Main();
         main.registerNewEnvVars(args);
         main.registerCommandHandler();

@@ -2,7 +2,7 @@ package service;
 
 import constants.OutputConstants;
 import constants.ParserConstants;
-import dto.KV;
+import dto.KVDto;
 import enums.ExpiryType;
 
 import java.io.IOException;
@@ -21,15 +21,15 @@ public class RDBParser {
 
     private static final Integer BYTE_BUFFER_SIZE = 8092;
     private final Map<String, Object[]> MAP = new HashMap<>();
-    private ByteBuffer byteBuffer;
-    private ReadableByteChannel byteChannel;
+    private final ByteBuffer byteBuffer;
+    private final ReadableByteChannel byteChannel;
     private Boolean isValidate;
     private Boolean isFirstFill;
     private long kvPairSize;
     private long kvPairSizeWithExpiry;
     private boolean isEOF;
     private byte[] checksum;
-    private KV curKV; // subject to frequent change
+    private KVDto curKV; // subject to frequent change
 
     public RDBParser(Path path) throws IOException {
         this.byteBuffer = ByteBuffer.allocate(BYTE_BUFFER_SIZE);
@@ -231,9 +231,9 @@ public class RDBParser {
         this.curKV = buildKVFromExpiryBytes(ExpiryType.SC, ParserConstants.NUM_EXPIRY_BITS_SC);
     }
 
-    private KV buildKVFromExpiryBytes(ExpiryType expiryType, int numExpiryBytes) throws IOException {
+    private KVDto buildKVFromExpiryBytes(ExpiryType expiryType, int numExpiryBytes) throws IOException {
         byte[] bytes = readNBytes(numExpiryBytes);
-        KV kv = new KV();
+        KVDto kv = new KVDto();
         kv.setExpiryType(expiryType);
         kv.setExpiryTime(RDBParserUtils.fromBytesV1(bytes));
         return kv;
@@ -251,7 +251,7 @@ public class RDBParser {
         // and "the number of keys with expirations", respectively
         this.kvPairSize = readLength();
         this.kvPairSizeWithExpiry = readLength();
-        System.out.println("[debug only] kvSize=" + this.kvPairSize + "; kvSize with expiry=" + this.kvPairSizeWithExpiry);
+        System.out.printf("[debug only] kvSize=%s; kvSize with expiry=%s\n",this.kvPairSize, this.kvPairSizeWithExpiry);
     }
 
     private void handleDBSelect() throws IOException {
@@ -270,7 +270,7 @@ public class RDBParser {
         this.isEOF = true;
         int version = Integer.parseInt(getConfigFromJVM(OutputConstants.REDIS_RDB_VERSION));
         this.checksum = version >= 5 ? this.readChecksum() : this.getEmptyChecksum();
-        System.out.println("[debug only] + checksum=" + this.checksum);
+        System.out.printf("[debug only] + checksum=%s\n", this.checksum);
     }
 
     private byte[] readChecksum() {

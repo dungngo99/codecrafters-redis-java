@@ -1,8 +1,6 @@
 package enums;
 
-import java.util.Objects;
-
-public enum Command {
+public enum CommandType {
     PING("ping", false),
     ECHO("echo", false),
     GET("get", false),
@@ -16,18 +14,20 @@ public enum Command {
     REPLCONF("replconf", false),
     LISTENING_PORT("listening-port", false),
     CAPA("capa", false),
-    PSYNC("psync", false);
+    PSYNC("psync", false),
+    GETACK("getack", false),
+    ACK("ack", false);
 
-    private String alias;
-    private boolean isWrite;
+    private final String alias;
+    private final boolean isWrite;
 
-    Command(String alias, boolean isWrite) {
+    CommandType(String alias, boolean isWrite) {
         this.alias = alias;
         this.isWrite = isWrite;
     }
 
-    public static Command fromAlias(String alias) {
-        for (Command command: values()) {
+    public static CommandType fromAlias(String alias) {
+        for (CommandType command: values()) {
             if (command.getAlias().equalsIgnoreCase(alias)) {
                 return command;
             }

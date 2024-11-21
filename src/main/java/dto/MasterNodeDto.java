@@ -4,12 +4,12 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class MasterNode extends ServerNode {
+public class MasterNodeDto extends ServerNodeDto {
 
     private List<Socket> replicaNodeSocketList;
-    public ConcurrentLinkedQueue<PropagateTask> taskQueue;
+    public ConcurrentLinkedQueue<TaskDto> taskQueue;
 
-    public MasterNode(String host, int port) {
+    public MasterNodeDto(String host, int port) {
         super(host, port);
         replicaNodeSocketList = new ArrayList<>();
         this.taskQueue = new ConcurrentLinkedQueue<>();
@@ -23,11 +23,11 @@ public class MasterNode extends ServerNode {
         this.replicaNodeSocketList = replicaNodeSocketList;
     }
 
-    public ConcurrentLinkedQueue<PropagateTask> getTaskQueue() {
+    public ConcurrentLinkedQueue<TaskDto> getTaskQueue() {
         return taskQueue;
     }
 
-    public void setTaskQueue(ConcurrentLinkedQueue<PropagateTask> taskQueue) {
+    public void setTaskQueue(ConcurrentLinkedQueue<TaskDto> taskQueue) {
         this.taskQueue = taskQueue;
     }
 }
