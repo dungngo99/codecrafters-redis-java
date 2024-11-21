@@ -2,7 +2,6 @@ package service;
 
 import java.security.SecureRandom;
 import java.util.Locale;
-import java.util.Random;
 
 public class RandomUtils {
 

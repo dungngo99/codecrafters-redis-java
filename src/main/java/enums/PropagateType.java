@@ -1,12 +1,8 @@
 package enums;
 
-import dto.TaskDto;
-
 public enum PropagateType {
     DEFAULT(0, "default", false),
-    EMPTY_RDB_TRANSFER(1, "rdb_transfer", true),
-    GET_ACK(2, "getack", true),
-    ACK(3, "ack", false);
+    EMPTY_RDB_TRANSFER(1, "rdb_transfer", true);
 
     private final Integer status;
     private final String keyword;

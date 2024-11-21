@@ -3,9 +3,7 @@ package handler.command.impl;
 import constants.OutputConstants;
 import enums.CommandType;
 import handler.command.CommandHandler;
-import handler.job.impl.PropagateHandler;
 import service.RESPUtils;
-import service.ServerUtils;
 
 import java.net.Socket;
 import java.util.HashMap;
