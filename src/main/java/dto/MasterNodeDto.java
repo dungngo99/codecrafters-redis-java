@@ -2,17 +2,16 @@ package dto;
 
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MasterNodeDto extends ServerNodeDto {
 
     private List<Socket> replicaNodeSocketList;
-    public ConcurrentLinkedQueue<TaskDto> taskQueue;
+    private Integer numReplicas;
 
     public MasterNodeDto(String host, int port) {
         super(host, port);
         replicaNodeSocketList = new ArrayList<>();
-        this.taskQueue = new ConcurrentLinkedQueue<>();
+        numReplicas = 0;
     }
 
     public List<Socket> getReplicaNodeSocketList() {
@@ -23,11 +22,11 @@ public class MasterNodeDto extends ServerNodeDto {
         this.replicaNodeSocketList = replicaNodeSocketList;
     }
 
-    public ConcurrentLinkedQueue<TaskDto> getTaskQueue() {
-        return taskQueue;
+    public Integer getNumReplicas() {
+        return numReplicas;
     }
 
-    public void setTaskQueue(ConcurrentLinkedQueue<TaskDto> taskQueue) {
-        this.taskQueue = taskQueue;
+    public void setNumReplicas(Integer numReplicas) {
+        this.numReplicas = numReplicas;
     }
 }

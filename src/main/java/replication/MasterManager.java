@@ -25,12 +25,12 @@ public class MasterManager {
 
     public static void registerReplicaNodeConnection(Socket socket) {
         if (socket == null) {
-            return;
+            throw new RuntimeException("invalid param");
         }
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
         MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
         if (masterNode == null) {
-            return;
+            throw new RuntimeException("master node not found (non-master node should not call this method)");
         }
         masterNode.getReplicaNodeSocketList().add(socket);
     }
@@ -54,6 +54,25 @@ public class MasterManager {
 
     public static String getRequestACKFromReplica() {
         return RESPUtils.requestRESPReplConfAck();
+    }
+
+    public static void incrementConnectedReplica() {
+        String masterNodeId = SystemPropHelper.getSetMasterNodeId();
+        MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
+        if (masterNode == null) {
+            throw new RuntimeException("master node not found (non-master node should not call this method)");
+        }
+        masterNode.setNumReplicas(masterNode.getNumReplicas()+1);
+        MASTER_NODE_MAP.put(masterNodeId, masterNode);
+    }
+
+    public static int getNumConnectedReplica() {
+        String masterNodeId = SystemPropHelper.getSetMasterNodeId();
+        MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
+        if (masterNode == null) {
+            throw new RuntimeException("master node not found (non-master node should not call this method)");
+        }
+        return masterNode.getNumReplicas();
     }
 
     /**
@@ -84,7 +103,7 @@ public class MasterManager {
 
     /**
      * Solution 2: command will be processed immediately
-     * @param command
+     * @param command RESP command
      */
     public static void propagateCommand(String command) {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();

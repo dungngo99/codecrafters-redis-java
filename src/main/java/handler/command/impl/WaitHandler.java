@@ -3,6 +3,7 @@ package handler.command.impl;
 import constants.OutputConstants;
 import enums.CommandType;
 import handler.command.CommandHandler;
+import replication.MasterManager;
 import service.RESPUtils;
 
 import java.net.Socket;
@@ -19,6 +20,12 @@ public class WaitHandler implements CommandHandler {
         if (list == null || list.isEmpty()) {
             throw new RuntimeException("invalid param");
         }
-        return RESPUtils.toSimpleInt(OutputConstants.DEFAULT_NO_REPLICA_CONNECTION);
+        try {
+            int num = MasterManager.getNumConnectedReplica();
+            return RESPUtils.toSimpleInt(num);
+        } catch (Exception e) {
+            System.out.println("failed to get num connected replicas due to " + e.getMessage());
+            return RESPUtils.toSimpleInt(OutputConstants.DEFAULT_NO_REPLICA_CONNECTION);
+        }
     }
 }

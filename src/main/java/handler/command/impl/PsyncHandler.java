@@ -59,5 +59,6 @@ public class PsyncHandler implements CommandHandler {
                 .addInputByteRead(0) // n/a
                 .build();
         PropagateHandler.registerTask(jobId, transferEmptyRDBTaskDto);
+        MasterManager.incrementConnectedReplica();
     }
 }
