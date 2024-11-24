@@ -76,7 +76,8 @@ public class MasterManager {
                     .addCommandStr(command)
                     .addJobType(JobType.PROPAGATE)
                     .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
-                    .build();
+                    .addInputByteRead(0)
+                    .build(); // n/a
             PropagateHandler.registerTask(jobId, taskDto);
         }
     }

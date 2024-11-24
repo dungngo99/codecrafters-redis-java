@@ -16,7 +16,7 @@ public class EchoHandler implements CommandHandler {
     @Override
     public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         return RESPUtils.getRESPEcho((String) list.getFirst());
     }

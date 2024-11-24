@@ -6,7 +6,7 @@ import dto.JobDto;
 import dto.RESPResultDto;
 import dto.TaskDto;
 import enums.JobType;
-import enums.ReplHandshakeType;
+import enums.ReplCommandType;
 import handler.job.JobHandler;
 import service.RESPParser;
 import service.RESPUtils;
@@ -22,13 +22,30 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class HandshakeHandler implements JobHandler {
-    public static final ConcurrentHashMap<String, Integer> REPLICA_STATUS_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Integer> REPLICA_STATUS_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Integer> REPLICA_OFFSET_MAP = new ConcurrentHashMap<>();
+
+    public static void registerTask(String jobId, String task) {
+        JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
+        if (task == null || task.isEmpty()) {
+            return;
+        }
+        TaskDto taskDto = new TaskDto.Builder()
+                .addJobType(JobType.HANDSHAKE)
+                .addCommandStr(task)
+                .addSocket(jobDto.getSocket())
+                .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
+                .addInputByteRead(0)
+                .build(); // n/a
+        jobDto.getTaskQueue().add(taskDto);
+    }
 
     @Override
     public void registerJob(JobDto jobDto) {
         String jobId = ServerUtils.formatIdFromSocket(jobDto.getSocket());
         JobHandler.JOB_MAP.put(jobId, jobDto);
-        HandshakeHandler.REPLICA_STATUS_MAP.put(jobId, ReplHandshakeType.DEFAULT.getStatus());
+        HandshakeHandler.REPLICA_STATUS_MAP.put(jobId, ReplCommandType.DEFAULT.getStatus());
+        HandshakeHandler.REPLICA_OFFSET_MAP.put(jobId, OutputConstants.CLIENT_REPL_OFFSET_DEFAULT);
         new Thread(() -> listenTask(jobId)).start();
         new Thread(() -> processTask(jobId)).start();
     }
@@ -68,24 +85,6 @@ public class HandshakeHandler implements JobHandler {
         }
     }
 
-    public static void registerTask(String jobId, String task) {
-        JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
-        if (task == null || task.isEmpty()) {
-            return;
-        }
-        TaskDto taskDto = new TaskDto.Builder()
-                .addJobType(JobType.HANDSHAKE)
-                .addCommandStr(task)
-                .addSocket(jobDto.getSocket())
-                .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
-                .build();
-        jobDto.getTaskQueue().add(taskDto);
-    }
-
-    public static void incrementMasterStatus(String jobId) {
-        HandshakeHandler.REPLICA_STATUS_MAP.put(jobId, HandshakeHandler.REPLICA_STATUS_MAP.get(jobId)+1);
-    }
-
     @Override
     public void processTask(String jobId) {
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
@@ -97,10 +96,12 @@ public class HandshakeHandler implements JobHandler {
                 while(!taskQueue.isEmpty()) {
                     TaskDto taskDto = taskQueue.poll();
                     if (canProcessTask(taskDto)) {
-                        HandshakeHandler.incrementMasterStatus(jobId);
                         if (canWriteTask(taskDto)) {
-                            ServerUtils.writeThenFlushString(taskDto.getSocket(), taskDto.getCommandStr());
+                            String commandStr = updateCommandReplConfAckOffsetIfMatch(taskDto);
+                            ServerUtils.writeThenFlushString(taskDto.getSocket(), commandStr);
                         }
+                        updateReplicaOffsetByTask(taskDto);
+                        incrementReplicaStatusByTask(taskDto);
                     } else {
                         taskQueue.add(taskDto);
                     }
@@ -131,7 +132,14 @@ public class HandshakeHandler implements JobHandler {
             return false;
         }
         String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
-        return ReplHandshakeType.canProcessTask(taskDto.getCommandStr(), HandshakeHandler.REPLICA_STATUS_MAP.get(jobId));
+        if (isReplicaCompleteHandshake(jobId)) {
+            return true;
+        }
+        if (RESPUtils.isValidHandshakeMasterRespSimpleString(taskDto.getCommandStr())
+                || RESPUtils.isValidHandshakeReplicaCommand(taskDto.getCommandStr())) {
+            return ReplCommandType.canProcessTask(taskDto.getCommandStr(), HandshakeHandler.REPLICA_STATUS_MAP.get(jobId));
+        }
+        return false;
     }
 
 
@@ -142,6 +150,50 @@ public class HandshakeHandler implements JobHandler {
                 || !Objects.equals(taskDto.getJobType(), JobType.HANDSHAKE)) {
             return false;
         }
-        return ReplHandshakeType.canWriteTask(taskDto.getCommandStr());
+        return ReplCommandType.canWriteTask(taskDto.getCommandStr());
+    }
+
+    private boolean isReplicaCompleteHandshake(String jobId) {
+        Integer status = HandshakeHandler.REPLICA_STATUS_MAP.get(jobId);
+        return Objects.equals(status, ReplCommandType.EMPTY_RDB_TRANSFER.getStatus());
+    }
+
+    private String updateCommandReplConfAckOffsetIfMatch(TaskDto taskDto) {
+        String commandStr = taskDto.getCommandStr();
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (isReplConfAckWithDefaultOffset(taskDto)) {
+            int offset = getCurrentReplicaOffset(jobId);
+            commandStr = RESPUtils.respondRESPReplConfAckWithActualOffset(offset);
+        }
+        return commandStr;
+    }
+
+    private boolean isReplConfAckWithDefaultOffset(TaskDto taskDto) {
+        return Objects.equals(RESPUtils.respondRESPReplConfAckWithDefaultOffset(), taskDto.getCommandStr());
+    }
+
+    private int getCurrentReplicaOffset(String jobId) {
+        if (!isReplicaCompleteHandshake(jobId)) {
+            return 0;
+        }
+        return HandshakeHandler.REPLICA_OFFSET_MAP.get(jobId);
+    }
+
+    private void incrementReplicaStatusByTask(TaskDto taskDto) {
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (isReplicaCompleteHandshake(jobId)) {
+            // disallow increment replica status if handshake is already complete
+            return;
+        }
+        HandshakeHandler.REPLICA_STATUS_MAP.put(jobId, HandshakeHandler.REPLICA_STATUS_MAP.get(jobId)+1);
+    }
+
+    private void updateReplicaOffsetByTask(TaskDto taskDto) {
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (!isReplicaCompleteHandshake(jobId)) {
+            return;
+        }
+        Integer offset = HandshakeHandler.REPLICA_OFFSET_MAP.get(jobId);
+        HandshakeHandler.REPLICA_OFFSET_MAP.put(jobId, offset + taskDto.getInputByteRead());
     }
 }

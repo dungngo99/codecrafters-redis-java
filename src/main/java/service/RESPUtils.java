@@ -1,11 +1,10 @@
 package service;
 
 import constants.OutputConstants;
+import constants.ParserConstants;
 import dto.RESPResultDto;
 import dto.TaskDto;
 import enums.CommandType;
-import enums.JobType;
-import enums.PropagateType;
 import enums.RESPResultType;
 
 import java.io.IOException;
@@ -78,6 +77,11 @@ public class RESPUtils {
         return toArray(list);
     }
 
+    public static String respondRESPReplConfAckWithActualOffset(int offset) {
+        List<String> list = List.of(CommandType.REPLCONF.name(), CommandType.ACK.name(), String.valueOf(offset));
+        return toArray(list);
+    }
+
     public static byte[] fromByteList(List<Byte> list) {
         int l = list.size();
         byte[] array = new byte[l];
@@ -122,12 +126,34 @@ public class RESPUtils {
                 || resp.startsWith(OutputConstants.PLUS));
     }
 
-    public static boolean isValidHandshakeReplicationSimpleString(String resp) {
-        return Objects.nonNull(resp) &&
-                (resp.startsWith(OutputConstants.OK)
-                        || resp.startsWith(OutputConstants.REPLICA_FULL_RESYNC)
-                        || resp.startsWith(OutputConstants.PONG)
-                        || resp.toLowerCase().contains(OutputConstants.MASTER_TO_REPLICA_ACK));
+    public static boolean isOKResp(String resp) {
+        return Objects.nonNull(resp) && resp.startsWith(OutputConstants.OK);
+    }
+
+    public static boolean isReplicaFullResyncResp(String resp) {
+        return Objects.nonNull(resp) && resp.startsWith(OutputConstants.REPLICA_FULL_RESYNC);
+    }
+
+    public static boolean isPONGResp(String resp) {
+        return Objects.nonNull(resp) && resp.startsWith(OutputConstants.PONG);
+    }
+
+    public static boolean isMagicNumberResp(String resp) {
+        return Objects.nonNull(resp) && resp.contains(ParserConstants.MAGIC_NUMBER);
+    }
+
+    public static boolean isValidHandshakeMasterRespSimpleString(String resp) {
+        return isPONGResp(resp)
+                || isOKResp(resp)
+                || isReplicaFullResyncResp(resp)
+                || isMagicNumberResp(resp);
+    }
+
+    public static boolean isValidHandshakeReplicaCommand(String command) {
+        return CommandType.isPingCommand(command)
+                || CommandType.isReplConfListeningPort(command)
+                || CommandType.isReplConfCapa(command)
+                || CommandType.isPsync(command);
     }
 
     public static List<TaskDto> convertToTasks(RESPResultDto result) throws IOException {
@@ -147,21 +173,17 @@ public class RESPUtils {
 
     private static List<TaskDto> convertToTasksFromSimpleString(RESPResultDto resultDto) {
         List<String> list = resultDto.getList();
-        if (list == null || list.isEmpty()) {
-            return List.of();
+        List<Integer> inputByteReads = resultDto.getByteReads();
+        if (list == null || list.isEmpty() || inputByteReads == null || inputByteReads.isEmpty()) {
+            throw new RuntimeException("invalid param");
         }
         String string = list.getFirst();
-        JobType jobType = resultDto.getJobType();
-        if (Objects.equals(jobType, JobType.RESP) && !RESPUtils.isValidRESPResponse(string)) {
-            return List.of();
-        }
-        if (Objects.equals(jobType, JobType.HANDSHAKE) && !RESPUtils.isValidHandshakeReplicationSimpleString(string)) {
-            return List.of();
-        }
+        Integer inputByteRead = inputByteReads.getFirst();
         TaskDto taskDto = new TaskDto.Builder()
-                .addJobType(jobType)
+                .addJobType(resultDto.getJobType())
                 .addSocket(resultDto.getSocket())
                 .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
+                .addInputByteRead(inputByteRead)
                 .build();
         if (resultDto.isUseBytes()) {
             taskDto.setCommand(string.getBytes(StandardCharsets.UTF_8));
@@ -173,31 +195,35 @@ public class RESPUtils {
 
     private static List<TaskDto> convertToTasksFromList(RESPResultDto resultDto) throws IOException {
         List<String> list = resultDto.getList();
+        List<Integer> inputByteReads = resultDto.getByteReads();
         if (list == null || list.isEmpty() || resultDto.getSocket() == null) {
-            return List.of();
+            throw new RuntimeException("invalid param");
         }
         if (resultDto.isPipeline()) {
             byte[] bytes = fromStringList(list);
             if (bytes.length == 0) {
-                return List.of();
+                throw new RuntimeException("invalid param");
             } else {
                 TaskDto taskDto = new TaskDto.Builder()
                         .addJobType(resultDto.getJobType())
                         .addSocket(resultDto.getSocket())
                         .addCommand(bytes)
                         .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
+                        .addInputByteRead(0) // n/a
                         .build();
                 return new ArrayList<>(List.of(taskDto));
             }
         } else {
             List<TaskDto> taskDtoList = new ArrayList<>();
-            for (String ans: list) {
+            int l = list.size();
+            for (int i=0; i<l; i++) {
                 RESPResultDto subResult = new RESPResultDto();
                 subResult.setJobType(resultDto.getJobType());
                 subResult.setType(RESPResultType.STRING);
-                subResult.setList(List.of(ans));
+                subResult.setList(List.of(list.get(i)));
                 subResult.setSocket(resultDto.getSocket());
                 subResult.setUseBytes(resultDto.isUseBytes());
+                subResult.setByteReads(List.of(inputByteReads.get(i)));
                 taskDtoList.addAll(convertToTasks(subResult));
             }
             return taskDtoList;

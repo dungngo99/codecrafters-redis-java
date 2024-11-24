@@ -21,12 +21,12 @@ public class KeysHandler implements CommandHandler {
     @Override
     public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         String arg = (String) list.get(0);
         List<String> ffix = parseFix(arg);
         if (ffix.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         if (ffix.size() == 1) {
             return handleSingleKey(clientSocket, ffix);
@@ -34,7 +34,7 @@ public class KeysHandler implements CommandHandler {
         if (ffix.size() == 2) {
             return handlePreSuffix(ffix);
         }
-        return "";
+        return OutputConstants.EMPTY;
     }
 
     private List<String> parseFix(String str) {
@@ -67,7 +67,7 @@ public class KeysHandler implements CommandHandler {
                     .toList();
         }
         if (caches.isEmpty()) {
-            return "";
+            return OutputConstants.EMPTY;
         }
         List<String> keys = caches.stream()
                 .map(Map.Entry::getKey)

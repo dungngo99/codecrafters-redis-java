@@ -18,7 +18,7 @@ public class GetHandler implements CommandHandler {
     @Override
     public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         String key = (String) list.get(0);
         if (!RedisLocalMap.LOCAL_MAP.containsKey(key)) {

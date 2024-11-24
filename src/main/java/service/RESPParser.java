@@ -41,15 +41,23 @@ public class RESPParser {
 
     public RESPResultDto process() throws IOException {
         List<String> list = new ArrayList<>();
+        List<Integer> byteReads = new ArrayList<>();
+        int byteHasRead = 0;
         while (true) {
             String ans = process0();
             if (ans == null || ans.isEmpty()) {
                 break;
             }
             list.add(ans);
+
+            // calculate byte stream READ per input command
+            int byteRead = inputStream.getCount()-byteHasRead;
+            byteReads.add(byteRead);
+            byteHasRead+=byteRead;
         }
         RESPResultDto result = new RESPResultDto();
         result.setList(list);
+        result.setByteReads(byteReads);
         result.setSocket(clientSocket);
         if (list.isEmpty()) {
             result.setType(RESPResultType.EMPTY);

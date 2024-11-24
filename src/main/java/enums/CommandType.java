@@ -1,5 +1,7 @@
 package enums;
 
+import java.util.Objects;
+
 public enum CommandType {
     PING("ping", false),
     ECHO("echo", false),
@@ -33,6 +35,28 @@ public enum CommandType {
             }
         }
         return null;
+    }
+
+    public static boolean isPingCommand(String command) {
+        return Objects.nonNull(command)
+                && command.toLowerCase().contains(PING.getAlias());
+    }
+
+    public static boolean isReplConfListeningPort(String command) {
+        return Objects.nonNull(command)
+                && command.toLowerCase().contains(REPLCONF.getAlias())
+                && command.toLowerCase().contains(LISTENING_PORT.getAlias());
+    }
+
+    public static boolean isReplConfCapa(String command) {
+        return Objects.nonNull(command)
+                && command.toLowerCase().contains(REPLCONF.getAlias())
+                && command.toLowerCase().contains(CAPA.getAlias());
+    }
+
+    public static boolean isPsync(String command) {
+        return Objects.nonNull(command)
+                && command.toLowerCase().contains(PSYNC.getAlias());
     }
 
     public String getAlias() {

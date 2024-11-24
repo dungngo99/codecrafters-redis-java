@@ -264,7 +264,7 @@ public class RDBParser {
         ).entrySet());
     }
 
-    private void handleEOF() throws IOException {
+    private void handleEOF() {
         // Marks the end of the RDB file.
         // verify checksum
         this.isEOF = true;

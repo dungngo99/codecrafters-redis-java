@@ -18,11 +18,11 @@ public class SaveHandler implements CommandHandler {
     @Override
     public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         String command = (String) list.get(0);
         if (!CommandType.SAVE.name().equalsIgnoreCase(command)) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         RDBLoaderUtils.load();
         return RESPUtils.getRESPOk();

@@ -12,6 +12,7 @@ public class TaskDto {
         private String commandStr;
         private byte[] command;
         private int freq;
+        private int inputByteRead;
 
         public Builder addJobType(JobType jobType) {
             this.jobType = jobType;
@@ -38,6 +39,11 @@ public class TaskDto {
             return this;
         }
 
+        public Builder addInputByteRead(int inputByteRead) {
+            this.inputByteRead = inputByteRead;
+            return this;
+        }
+
         public TaskDto build() {
             TaskDto taskDto = new TaskDto();
             taskDto.setJobType(this.jobType);
@@ -45,6 +51,7 @@ public class TaskDto {
             taskDto.setCommandStr(this.commandStr);
             taskDto.setCommand(this.command);
             taskDto.setFreq(this.freq);
+            taskDto.setInputByteRead(this.inputByteRead);
             return taskDto;
         }
     }
@@ -54,6 +61,7 @@ public class TaskDto {
     private String commandStr;
     private byte[] command;
     private int freq;
+    private int inputByteRead;
 
     public JobType getJobType() {
         return jobType;
@@ -93,6 +101,14 @@ public class TaskDto {
 
     public void setFreq(int freq) {
         this.freq = freq;
+    }
+
+    public int getInputByteRead() {
+        return inputByteRead;
+    }
+
+    public void setInputByteRead(int inputByteRead) {
+        this.inputByteRead = inputByteRead;
     }
 
     @Override

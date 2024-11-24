@@ -20,7 +20,7 @@ public class SetHandler implements CommandHandler {
     @Override
     public String process(Socket clientSocket, List list) {
         if (list == null || list.isEmpty() || list.size() < 2) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         String key = (String) list.get(0);
         Object value = list.get(1);
@@ -45,7 +45,7 @@ public class SetHandler implements CommandHandler {
     @Override
     public void propagate(List list) {
         if (list == null || list.isEmpty() || list.size() < 2) {
-            return;
+            throw new RuntimeException("invalid param");
         }
         List<String> strings = new ArrayList<>();
         list.forEach(e -> strings.add((String) e));

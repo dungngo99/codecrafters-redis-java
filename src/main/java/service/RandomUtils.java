@@ -8,7 +8,6 @@ public class RandomUtils {
     public static final String UPPER_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String LOWER_STRING = UPPER_STRING.toLowerCase(Locale.getDefault());
     public static final String DIGITS = "0123456789";
-    public static final String ALPHANUMERICS = UPPER_STRING + LOWER_STRING + DIGITS;
     public static final String LOWER_ALPHANUMERICS = LOWER_STRING + DIGITS;
 
     private static class Random {

@@ -56,6 +56,7 @@ public class PsyncHandler implements CommandHandler {
                 .addCommandStr(PropagateType.EMPTY_RDB_TRANSFER.getKeyword())
                 .addJobType(JobType.PROPAGATE)
                 .addFreq(OutputConstants.THREAD_SLEEP_100000_MICROS)
+                .addInputByteRead(0) // n/a
                 .build();
         PropagateHandler.registerTask(jobId, transferEmptyRDBTaskDto);
     }

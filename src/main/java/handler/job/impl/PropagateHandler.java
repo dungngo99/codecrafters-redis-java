@@ -26,19 +26,6 @@ public class PropagateHandler implements JobHandler {
         jobDto.getTaskQueue().add(task);
     }
 
-    public static void incrementMasterStatus(String jobId) {
-        if (isMasterCompletePropagate(jobId)) {
-            // once complete, not allow to update master status
-            return;
-        }
-        PropagateHandler.MASTER_STATUS_MAP.put(jobId, PropagateHandler.MASTER_STATUS_MAP.get(jobId)+1);
-    }
-
-    public static boolean isMasterCompletePropagate(String jobId) {
-        Integer status = PropagateHandler.MASTER_STATUS_MAP.get(jobId);
-        return Objects.equals(status, PropagateType.EMPTY_RDB_TRANSFER.getStatus());
-    }
-
     @Override
     public void registerJob(JobDto jobDto) {
         String jobId = ServerUtils.formatIdFromSocket(jobDto.getSocket());
@@ -62,12 +49,12 @@ public class PropagateHandler implements JobHandler {
                 ConcurrentLinkedQueue<TaskDto> taskQueue = jobDto.getTaskQueue();
                 while(!taskQueue.isEmpty()) {
                     TaskDto taskDto = taskQueue.poll();
-                    Thread.sleep(Duration.of(taskDto.getFreq(), ChronoUnit.MICROS));
+                    Thread.sleep(Duration.of(taskDto.getFreq(), ChronoUnit.MICROS)); // issue: fullresync comes after empty rdb
                     if (canProcessTask(taskDto)) {
-                        PropagateHandler.incrementMasterStatus(jobId);
                         if (canWriteTask(taskDto)) {
                             ServerUtils.writeThenFlush(clientSocket, taskDto.getCommandStr(), taskDto.getCommand());
                         }
+                        incrementMasterStatus(taskDto);
                     } else {
                         taskQueue.add(taskDto);
                     }
@@ -97,7 +84,7 @@ public class PropagateHandler implements JobHandler {
             return false;
         }
         String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
-        if (PropagateHandler.isMasterCompletePropagate(jobId)) {
+        if (isMasterCompletePropagate(jobId)) {
             return true;
         }
         return PropagateType.canProcessTask(taskDto.getCommandStr(), PropagateHandler.MASTER_STATUS_MAP.get(jobId));
@@ -111,9 +98,23 @@ public class PropagateHandler implements JobHandler {
             return false;
         }
         String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
-        if (PropagateHandler.isMasterCompletePropagate(jobId)) {
+        if (isMasterCompletePropagate(jobId)) {
             return true;
         }
         return PropagateType.canWriteTask(taskDto.getCommandStr());
+    }
+
+    private void incrementMasterStatus(TaskDto taskDto) {
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (isMasterCompletePropagate(jobId)) {
+            // once complete, not allow to update master status
+            return;
+        }
+        PropagateHandler.MASTER_STATUS_MAP.put(jobId, PropagateHandler.MASTER_STATUS_MAP.get(jobId)+1);
+    }
+
+    private boolean isMasterCompletePropagate(String jobId) {
+        Integer status = PropagateHandler.MASTER_STATUS_MAP.get(jobId);
+        return Objects.equals(status, PropagateType.EMPTY_RDB_TRANSFER.getStatus());
     }
 }

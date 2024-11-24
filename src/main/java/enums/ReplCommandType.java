@@ -1,6 +1,6 @@
 package enums;
 
-public enum ReplHandshakeType {
+public enum ReplCommandType {
     DEFAULT(0, "default", false),
     PING(1, "ping", true),
     PONG(2, "pong", false),
@@ -11,14 +11,14 @@ public enum ReplHandshakeType {
     PSYNC(7, "psync", true),
     FULL_RESYNC(8, "fullresync", false),
     EMPTY_RDB_TRANSFER(9, "redis", false),
-    ACK(9, "ack", true);
+    ACK(-1, "ack", true);
 
     private final int status;
     private final String keyword;
     private final boolean canWrite;
 
     public static boolean canProcessTask(String command, int status) {
-        for (ReplHandshakeType replHandshakeType: values()) {
+        for (ReplCommandType replHandshakeType: values()) {
             if (command != null
                     && command.toLowerCase().contains(replHandshakeType.getKeyword())
                     && replHandshakeType.getStatus()-1 == status) {
@@ -29,7 +29,7 @@ public enum ReplHandshakeType {
     }
 
     public static boolean canWriteTask(String command) {
-        for (ReplHandshakeType replHandshakeType: values()) {
+        for (ReplCommandType replHandshakeType: values()) {
             if (command != null && command.toLowerCase().contains(replHandshakeType.getKeyword())) {
                 return replHandshakeType.canWrite;
             }
@@ -37,7 +37,7 @@ public enum ReplHandshakeType {
         return false;
     }
 
-    ReplHandshakeType(int status, String keyword, boolean canWrite) {
+    ReplCommandType(int status, String keyword, boolean canWrite) {
         this.status = status;
         this.keyword = keyword;
         this.canWrite = canWrite;

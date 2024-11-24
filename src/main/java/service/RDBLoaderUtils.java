@@ -24,7 +24,7 @@ public class RDBLoaderUtils {
             rdbParser.parse();
             loadToLocalMap(rdbParser.getMap());
         } catch (IOException e) {
-            System.out.println(String.format("file %s does not exist, ignore loading from RDB", path));
+            System.out.println(String.format("file %s due to %s, ignore loading from RDB", e.getMessage(), path));
         }
     }
 

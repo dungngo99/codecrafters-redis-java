@@ -10,6 +10,7 @@ public class RESPResultDto {
 
     private RESPResultType type;
     private List<String> list;
+    private List<Integer> byteReads;
     private boolean isPipeline;
     private boolean isUseBytes;
     private JobType jobType;
@@ -29,6 +30,14 @@ public class RESPResultDto {
 
     public void setList(List<String> list) {
         this.list = list;
+    }
+
+    public List<Integer> getByteReads() {
+        return byteReads;
+    }
+
+    public void setByteReads(List<Integer> byteReads) {
+        this.byteReads = byteReads;
     }
 
     public boolean isPipeline() {

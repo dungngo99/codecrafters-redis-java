@@ -41,7 +41,7 @@ public class ConfigHandler implements CommandHandler {
 
     private String handleGet(List<Object> params) {
         if (params == null || params.isEmpty()) {
-            return "";
+            throw new RuntimeException("invalid param");
         }
         String param1 = ((String) params.get(0)).toLowerCase();
         if (OutputConstants.DIR.equalsIgnoreCase(param1) || OutputConstants.DB_FILENAME.equalsIgnoreCase(param1)) {
@@ -50,6 +50,6 @@ public class ConfigHandler implements CommandHandler {
                 return RESPUtils.toArray(List.of(param1, val));
             }
         }
-        return "";
+        return OutputConstants.EMPTY;
     }
 }
