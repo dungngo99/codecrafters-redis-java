@@ -51,6 +51,7 @@ public class Main {
         new InfoHandler().register();
         new ReplConfigHandler().register();
         new PsyncHandler().register();
+        new WaitHandler().register();
     }
 
     private void registerRDB() {

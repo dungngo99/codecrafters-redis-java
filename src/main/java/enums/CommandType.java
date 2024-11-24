@@ -18,7 +18,8 @@ public enum CommandType {
     CAPA("capa", false),
     PSYNC("psync", false),
     GETACK("getack", false),
-    ACK("ack", false);
+    ACK("ack", false),
+    WAIT("wait", false);
 
     private final String alias;
     private final boolean isWrite;
