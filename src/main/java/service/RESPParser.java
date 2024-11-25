@@ -4,6 +4,7 @@ import dto.RESPResultDto;
 import enums.CommandType;
 import enums.RESPResultType;
 import handler.command.CommandHandler;
+import replication.MasterManager;
 import stream.RedisInputStream;
 
 import java.io.IOException;
@@ -118,8 +119,13 @@ public class RESPParser {
         CommandType command = CommandType.fromAlias(alias);
         List args = list.subList(1, list.size());
         String val = commandHandler.process(clientSocket, args);
-        if (command != null && command.isWrite()) {
-            new Thread(() -> commandHandler.propagate(list)).start();
+        if (command != null
+                && command.isWrite()
+                && MasterManager.isMasterNode()) {
+            new Thread(() -> {
+                MasterManager.propagate(list);
+                MasterManager.setHasWriteReplicas();
+            }).start();
         }
         return val != null ? val : RESPUtils.getBulkNull();
     }

@@ -31,6 +31,7 @@ public class HandshakeHandler implements JobHandler {
             return;
         }
         TaskDto taskDto = new TaskDto.Builder()
+                .addTaskId(OutputConstants.DEFAULT_INVALID_TASK_DTO_ID)
                 .addJobType(JobType.HANDSHAKE)
                 .addCommandStr(task)
                 .addSocket(jobDto.getSocket())
@@ -100,6 +101,7 @@ public class HandshakeHandler implements JobHandler {
                             String commandStr = updateCommandReplConfAckOffsetIfMatch(taskDto);
                             ServerUtils.writeThenFlushString(taskDto.getSocket(), commandStr);
                         }
+                        // it is important to consider order of below methods
                         updateReplicaOffsetByTask(taskDto);
                         incrementReplicaStatusByTask(taskDto);
                     } else {

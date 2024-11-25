@@ -3,17 +3,18 @@ package handler.command.impl;
 import constants.OutputConstants;
 import enums.CommandType;
 import handler.command.CommandHandler;
+import replication.MasterManager;
 import service.RESPUtils;
 
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class ReplConfigHandler implements CommandHandler {
 
-    private static final Map<String, Function<List<Object>, String>> SUB_COMMANDS = new HashMap<>();
+    private static final Map<String, BiFunction<Socket, List<Object>, String>> SUB_COMMANDS = new HashMap<>();
 
     @Override
     public void register() {
@@ -33,7 +34,7 @@ public class ReplConfigHandler implements CommandHandler {
         if (!SUB_COMMANDS.containsKey(subcommand)) {
             throw new RuntimeException("invalid param");
         }
-        return SUB_COMMANDS.get(subcommand).apply(list.subList(1, list.size()));
+        return SUB_COMMANDS.get(subcommand).apply(clientSocket, list.subList(1, list.size()));
     }
 
     /**
@@ -41,7 +42,7 @@ public class ReplConfigHandler implements CommandHandler {
      * @param list subcommands
      * @return
      */
-    private String handleListeningPort(List list) {
+    private String handleListeningPort(Socket socket, List list) {
         return RESPUtils.getRESPOk();
     }
 
@@ -50,7 +51,7 @@ public class ReplConfigHandler implements CommandHandler {
      * @param list subcommands
      * @return
      */
-    private String handleCapa(List list) {
+    private String handleCapa(Socket socket, List list) {
         return RESPUtils.getRESPOk();
     }
 
@@ -59,7 +60,7 @@ public class ReplConfigHandler implements CommandHandler {
      * @param list subcommands
      * @return
      */
-    private String handleGetAck(List list) {
+    private String handleGetAck(Socket socket, List list) {
         return RESPUtils.respondRESPReplConfAckWithDefaultOffset();
     }
 
@@ -68,8 +69,8 @@ public class ReplConfigHandler implements CommandHandler {
      * @param list
      * @return
      */
-    private String handleAck(List list) {
-        System.out.printf("received ACK=%s from replica\n", list);
+    private String handleAck(Socket socket, List list) {
+        MasterManager.setACKedReplica(socket);
         return OutputConstants.EMPTY;
     }
 }

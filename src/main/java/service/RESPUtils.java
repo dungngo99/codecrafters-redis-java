@@ -186,6 +186,7 @@ public class RESPUtils {
         String string = list.getFirst();
         Integer inputByteRead = inputByteReads.getFirst();
         TaskDto taskDto = new TaskDto.Builder()
+                .addTaskId(OutputConstants.DEFAULT_INVALID_TASK_DTO_ID)
                 .addJobType(resultDto.getJobType())
                 .addSocket(resultDto.getSocket())
                 .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
@@ -211,6 +212,7 @@ public class RESPUtils {
                 throw new RuntimeException("invalid param");
             } else {
                 TaskDto taskDto = new TaskDto.Builder()
+                        .addTaskId(OutputConstants.DEFAULT_INVALID_TASK_DTO_ID)
                         .addJobType(resultDto.getJobType())
                         .addSocket(resultDto.getSocket())
                         .addCommand(bytes)

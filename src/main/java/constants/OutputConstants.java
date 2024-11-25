@@ -36,5 +36,6 @@ public class OutputConstants {
     public static final Integer THREAD_SLEEP_100000_MICROS = 100000;
     public static final String SERVER_NODE_ID_FORMAT = "%s::%s";
     public static final String EMPTY_RDB_FILE_CONTENT_HEX = "524544495330303131fa0972656469732d76657205372e322e30fa0a72656469732d62697473c040fa056374696d65c26d08bc65fa08757365642d6d656dc2b0c41000fa08616f662d62617365c000fff06e3bfec0ff5aa2";
-    public static final Integer DEFAULT_NO_REPLICA_CONNECTION = 0;
+    public static final Integer DEFAULT_NO_REPLICA_CONNECTED = 0;
+    public static final Integer DEFAULT_INVALID_TASK_DTO_ID = -1;
 }

@@ -7,12 +7,18 @@ import java.util.Arrays;
 
 public class TaskDto {
     public static class Builder {
+        private int taskId;
         private JobType jobType;
         private Socket socket;
         private String commandStr;
         private byte[] command;
         private int freq;
         private int inputByteRead;
+
+        public Builder addTaskId(int taskId) {
+            this.taskId = taskId;
+            return this;
+        }
 
         public Builder addJobType(JobType jobType) {
             this.jobType = jobType;
@@ -46,6 +52,7 @@ public class TaskDto {
 
         public TaskDto build() {
             TaskDto taskDto = new TaskDto();
+            taskDto.setTaskId(this.taskId);
             taskDto.setJobType(this.jobType);
             taskDto.setSocket(this.socket);
             taskDto.setCommandStr(this.commandStr);
@@ -56,12 +63,21 @@ public class TaskDto {
         }
     }
 
+    private int taskId;
     private JobType jobType;
     private Socket socket;
     private String commandStr;
     private byte[] command;
     private int freq;
     private int inputByteRead;
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
 
     public JobType getJobType() {
         return jobType;

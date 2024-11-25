@@ -41,15 +41,4 @@ public class SetHandler implements CommandHandler {
         RedisLocalMap.LOCAL_MAP.put(key, cache);
         return RESPUtils.getRESPOk();
     }
-
-    @Override
-    public void propagate(List list) {
-        if (list == null || list.isEmpty() || list.size() < 2) {
-            throw new RuntimeException("invalid param");
-        }
-        List<String> strings = new ArrayList<>();
-        list.forEach(e -> strings.add((String) e));
-        String command = RESPUtils.toArray(strings);
-        MasterManager.registerCommand(command);
-    }
 }

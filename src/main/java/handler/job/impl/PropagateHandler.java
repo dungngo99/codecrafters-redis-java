@@ -1,16 +1,21 @@
 package handler.job.impl;
 
 import dto.JobDto;
+import dto.MasterNodeDto;
+import dto.MasterReplicaDto;
 import dto.TaskDto;
 import enums.JobType;
 import enums.PropagateType;
 import handler.job.JobHandler;
+import replication.MasterManager;
 import service.ServerUtils;
+import service.SystemPropHelper;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -54,6 +59,8 @@ public class PropagateHandler implements JobHandler {
                         if (canWriteTask(taskDto)) {
                             ServerUtils.writeThenFlush(clientSocket, taskDto.getCommandStr(), taskDto.getCommand());
                         }
+                        // it is important to consider order of below methods
+                        incrementNumPropagateTaskSent(taskDto);
                         incrementMasterStatus(taskDto);
                     } else {
                         taskQueue.add(taskDto);
@@ -85,7 +92,7 @@ public class PropagateHandler implements JobHandler {
         }
         String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
         if (isMasterCompletePropagate(jobId)) {
-            return true;
+            return isPropagateTaskQueuedIdMatch(taskDto);
         }
         return PropagateType.canProcessTask(taskDto.getCommandStr(), PropagateHandler.MASTER_STATUS_MAP.get(jobId));
     }
@@ -116,5 +123,49 @@ public class PropagateHandler implements JobHandler {
     private boolean isMasterCompletePropagate(String jobId) {
         Integer status = PropagateHandler.MASTER_STATUS_MAP.get(jobId);
         return Objects.equals(status, PropagateType.EMPTY_RDB_TRANSFER.getStatus());
+    }
+
+    private boolean isPropagateTaskQueuedIdMatch(TaskDto taskDto) {
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (!isMasterCompletePropagate(jobId)) {
+            return false;
+        }
+        String masterNodeId = SystemPropHelper.getSetMasterNodeId();
+        MasterNodeDto masterNode = MasterManager.getMasterNodeMap().get(masterNodeId);
+        if (masterNode == null || masterNode.getMasterReplicaDtoList() == null) {
+            System.out.println("master node not found (non-master node should not call this method)");
+            return false;
+        }
+        List<MasterReplicaDto> mrDtoList = masterNode.getMasterReplicaDtoList();
+        for (MasterReplicaDto mrDto: mrDtoList) {
+            if (mrDto == null
+                    || !Objects.equals(taskDto.getSocket(), mrDto.getSocket())
+                    || taskDto.getTaskId() != mrDto.getNumTaskSent()+1) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void incrementNumPropagateTaskSent(TaskDto taskDto) {
+        String jobId = ServerUtils.formatIdFromSocket(taskDto.getSocket());
+        if (!isMasterCompletePropagate(jobId)) {
+            // before complete, not allow to update master num task queued
+            return;
+        }
+        String masterNodeId = SystemPropHelper.getSetMasterNodeId();
+        MasterNodeDto masterNode = MasterManager.getMasterNodeMap().get(masterNodeId);
+        if (masterNode == null || masterNode.getMasterReplicaDtoList() == null) {
+            System.out.println("master node not found (non-master node should not call this method)");
+            return;
+        }
+        List<MasterReplicaDto> mrDtoList = masterNode.getMasterReplicaDtoList();
+        for (MasterReplicaDto mrDto: mrDtoList) {
+            if (mrDto == null || !Objects.equals(taskDto.getSocket(), mrDto.getSocket())) {
+                continue;
+            }
+            mrDto.setNumTaskSent(mrDto.getNumTaskSent()+1);
+        }
     }
 }

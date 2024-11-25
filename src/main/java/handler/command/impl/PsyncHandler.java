@@ -30,6 +30,7 @@ public class PsyncHandler implements CommandHandler {
         registerMasterReplicaConnection(clientSocket);
         registerPropagateHandler(clientSocket);
         registerTasks(clientSocket);
+        MasterManager.incrementConnectedReplica();
         String masterReplicationID = SystemPropHelper.getSetMasterReplId();
         String str = String.format("%s %s %s", OutputConstants.REPLICA_FULL_RESYNC, masterReplicationID, OutputConstants.MASTER_REPL_OFFSET_DEFAULT);
         return RESPUtils.toSimpleString(str);
@@ -51,6 +52,7 @@ public class PsyncHandler implements CommandHandler {
     private void registerTasks(Socket socket) {
         String jobId = ServerUtils.formatIdFromSocket(socket);
         TaskDto transferEmptyRDBTaskDto = new TaskDto.Builder()
+                .addTaskId(OutputConstants.DEFAULT_INVALID_TASK_DTO_ID)
                 .addSocket(socket)
                 .addCommand(MasterManager.getTransferEmptyRDBFile())
                 .addCommandStr(PropagateType.EMPTY_RDB_TRANSFER.getKeyword())
@@ -59,6 +61,5 @@ public class PsyncHandler implements CommandHandler {
                 .addInputByteRead(0) // n/a
                 .build();
         PropagateHandler.registerTask(jobId, transferEmptyRDBTaskDto);
-        MasterManager.incrementConnectedReplica();
     }
 }

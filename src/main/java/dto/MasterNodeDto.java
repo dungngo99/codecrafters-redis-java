@@ -1,32 +1,31 @@
 package dto;
 
-import java.net.Socket;
 import java.util.*;
 
 public class MasterNodeDto extends ServerNodeDto {
 
-    private List<Socket> replicaNodeSocketList;
-    private Integer numReplicas;
+    private List<MasterReplicaDto> masterReplicaDtoList;
+    private Integer numConnectedReplicas;
 
     public MasterNodeDto(String host, int port) {
         super(host, port);
-        replicaNodeSocketList = new ArrayList<>();
-        numReplicas = 0;
+        masterReplicaDtoList = new ArrayList<>();
+        numConnectedReplicas = 0;
     }
 
-    public List<Socket> getReplicaNodeSocketList() {
-        return replicaNodeSocketList;
+    public List<MasterReplicaDto> getMasterReplicaDtoList() {
+        return masterReplicaDtoList;
     }
 
-    public void setReplicaNodeSocketList(List<Socket> replicaNodeSocketList) {
-        this.replicaNodeSocketList = replicaNodeSocketList;
+    public void setMasterReplicaDtoList(List<MasterReplicaDto> masterReplicaDtoList) {
+        this.masterReplicaDtoList = masterReplicaDtoList;
     }
 
-    public Integer getNumReplicas() {
-        return numReplicas;
+    public Integer getNumConnectedReplicas() {
+        return numConnectedReplicas;
     }
 
-    public void setNumReplicas(Integer numReplicas) {
-        this.numReplicas = numReplicas;
+    public void setNumConnectedReplicas(Integer numConnectedReplicas) {
+        this.numConnectedReplicas = numConnectedReplicas;
     }
 }
