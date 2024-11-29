@@ -1,6 +1,7 @@
 package dto;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StreamDto {
@@ -34,17 +35,17 @@ public class StreamDto {
      * temp solution: map<key=unique event ID, value=key-value mapping>
      * correct solution: radix trie
      */
-    private Map<String, EntryDto> streamMap;
+    private LinkedHashMap<String, EntryDto> streamMap;
 
     public StreamDto() {
-        this.streamMap = new HashMap<>();
+        this.streamMap = new LinkedHashMap<>();
     }
 
-    public Map<String, EntryDto> getStreamMap() {
+    public LinkedHashMap<String, EntryDto> getStreamMap() {
         return streamMap;
     }
 
-    public void setStreamMap(Map<String, EntryDto> streamMap) {
+    public void setStreamMap(LinkedHashMap<String, EntryDto> streamMap) {
         this.streamMap = streamMap;
     }
 }

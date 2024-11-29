@@ -51,6 +51,12 @@ public class RESPUtils {
         return joiner.toString();
     }
 
+    public static String toSimpleError(String error) {
+        StringJoiner joiner = new StringJoiner(OutputConstants.EMPTY, OutputConstants.DASH_DELIMITER, OutputConstants.CRLF);
+        joiner.add(error);
+        return joiner.toString();
+    }
+
     public static String getRESPPing() {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.ASTERISK, OutputConstants.CRLF);
         joiner.add(String.valueOf(OutputConstants.RESP_PING_ARRAY_LENGTH));

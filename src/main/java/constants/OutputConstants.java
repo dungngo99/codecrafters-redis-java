@@ -21,6 +21,7 @@ public class OutputConstants {
     public static final String REDIS_SERVER_PORT_KEY = "port";
     public static final String REDIS_SERVER_ROLE_TYPE = "role";
     public static final String COLON_DELIMITER = ":";
+    public static final String DASH_DELIMITER = "-";
     public static final String REDIS_SERVER_REPLICA_OF = "replicaof";
     public static final int MASTER_REPLID_LENGTH = 40;
     public static final String MASTER_REPLID = "master_replid";
@@ -39,4 +40,6 @@ public class OutputConstants {
     public static final Integer DEFAULT_NO_REPLICA_CONNECTED = 0;
     public static final Integer DEFAULT_INVALID_TASK_DTO_ID = -1;
     public static final String NONE_COMMAND_TYPE_FOR_MISSING_KEY = "none";
+    public static final String STREAM_EVENT_ID_SMALLER_OR_EQUAL_THAN_TOP_EVENT_ID_ERROR = "ERR The ID specified in XADD is equal or smaller than the target stream top item";
+    public static final String STREAM_EVENT_ID_SMALLER_OR_EQUAL_THAN_0_ERROR = "ERR The ID specified in XADD must be greater than 0-0";
 }
