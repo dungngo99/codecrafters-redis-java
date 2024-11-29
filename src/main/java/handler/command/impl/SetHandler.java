@@ -2,13 +2,12 @@ package handler.command.impl;
 
 import dto.CacheDto;
 import enums.CommandType;
+import enums.ValueType;
 import handler.command.CommandHandler;
-import replication.MasterManager;
 import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SetHandler implements CommandHandler {
@@ -34,7 +33,8 @@ public class SetHandler implements CommandHandler {
         }
 
         CacheDto cache = new CacheDto();
-        cache.setValue((String) value);
+        cache.setValue(value);
+        cache.setValueType(ValueType.STRING);
         if (expiry != null) {
             cache.setExpireTime(System.currentTimeMillis() + expiry);
         }

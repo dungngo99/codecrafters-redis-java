@@ -53,6 +53,7 @@ public class Main {
         new PsyncHandler().register();
         new WaitHandler().register();
         new TypeHandler().register();
+        new XAddHandler().register();
     }
 
     private void registerRDB() {

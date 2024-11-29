@@ -2,6 +2,7 @@ package service;
 
 import constants.OutputConstants;
 import dto.CacheDto;
+import enums.ValueType;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,7 @@ public class RDBLoaderUtils {
         }
         CacheDto cache = new CacheDto();
         cache.setValue(value[0]);
+        cache.setValueType(ValueType.STRING);
         if (value.length == 2) {
             cache.setExpireTime(Long.parseLong(value[1]));
         }

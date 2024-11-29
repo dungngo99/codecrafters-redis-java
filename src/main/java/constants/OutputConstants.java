@@ -39,5 +39,4 @@ public class OutputConstants {
     public static final Integer DEFAULT_NO_REPLICA_CONNECTED = 0;
     public static final Integer DEFAULT_INVALID_TASK_DTO_ID = -1;
     public static final String NONE_COMMAND_TYPE_FOR_MISSING_KEY = "none";
-    public static final String STRING_COMMAND_TYPE = "string";
 }

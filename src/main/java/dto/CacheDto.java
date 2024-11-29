@@ -1,14 +1,17 @@
 package dto;
 
-public class CacheDto {
-    private String value;
-    private Long expireTime;
+import enums.ValueType;
 
-    public String getValue() {
+public class CacheDto {
+    private Object value;
+    private Long expireTime;
+    private ValueType valueType;
+
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
@@ -20,11 +23,20 @@ public class CacheDto {
         this.expireTime = expireTime;
     }
 
+    public ValueType getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(ValueType valueType) {
+        this.valueType = valueType;
+    }
+
     @Override
     public String toString() {
-        return "Cache{" +
-                "value='" + value + '\'' +
+        return "CacheDto{" +
+                "value=" + value +
                 ", expireTime=" + expireTime +
+                ", valueType=" + valueType +
                 '}';
     }
 }
