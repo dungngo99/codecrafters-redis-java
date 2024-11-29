@@ -151,7 +151,7 @@ public class MasterManager {
                 // step 3: continuously check if get enough num of ACKs from Replicas
                 while (true) {
                     int ans = getNumACKedReplica();
-                    if (ans == expectedNumACKReplica) {
+                    if (ans >= expectedNumACKReplica) {
                         return RESPUtils.toSimpleInt(ans);
                     }
                     Thread.sleep(Duration.of(OutputConstants.THREAD_SLEEP_100_MICROS, ChronoUnit.MICROS));
@@ -294,9 +294,7 @@ public class MasterManager {
     private static void precheckValidMasterNode() {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
         MasterNodeDto masterNode = MASTER_NODE_MAP.get(masterNodeId);
-        if (masterNode == null
-                || masterNode.getMasterReplicaDtoList() == null
-                || masterNode.getMasterReplicaDtoList().isEmpty()) {
+        if (masterNode == null || masterNode.getMasterReplicaDtoList() == null) {
             throw new RuntimeException("master node not found (non-master node should not call this method)");
         }
     }
