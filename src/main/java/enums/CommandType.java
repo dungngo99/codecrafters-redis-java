@@ -21,7 +21,8 @@ public enum CommandType {
     ACK("ack", false),
     WAIT("wait", false),
     TYPE("type", false),
-    XADD("xadd", false);
+    XADD("xadd", false),
+    XRANGE("xrange", false);
 
     private final String alias;
     private final boolean isWrite;

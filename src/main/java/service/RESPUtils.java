@@ -57,6 +57,25 @@ public class RESPUtils {
         return joiner.toString();
     }
 
+    public static String toBulkStringFromNestedList(List<Object> list) {
+        return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
+    }
+
+    private static String toBulkStringFromNestedList0(List<Object> list) {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
+        joiner.add(OutputConstants.ASTERISK + list.size());
+        for (Object obj: list) {
+            if (obj instanceof String) {
+                String str = (String) obj;
+                joiner.add(OutputConstants.DOLLAR_SIZE + str.length());
+                joiner.add(str);
+            } else {
+                joiner.add(toBulkStringFromNestedList0((List<Object>) obj));
+            }
+        }
+        return joiner.toString();
+    }
+
     public static String getRESPPing() {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.ASTERISK, OutputConstants.CRLF);
         joiner.add(String.valueOf(OutputConstants.RESP_PING_ARRAY_LENGTH));

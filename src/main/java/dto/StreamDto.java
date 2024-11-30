@@ -1,17 +1,15 @@
 package dto;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class StreamDto {
     public static class EntryDto {
         private String id;
-        private Map<String, String> kvPair;
+        private LinkedHashMap<String, String> kvPair;
 
         public EntryDto(String id) {
             this.id = id;
-            this.kvPair = new HashMap<>();
+            this.kvPair = new LinkedHashMap<>();
         }
 
         public String getId() {
@@ -22,30 +20,31 @@ public class StreamDto {
             this.id = id;
         }
 
-        public Map<String, String> getKvPair() {
+        public LinkedHashMap<String, String> getKvPair() {
             return kvPair;
         }
 
-        public void setKvPair(Map<String, String> kvPair) {
+        public void setKvPair(LinkedHashMap<String, String> kvPair) {
             this.kvPair = kvPair;
         }
     }
 
     /**
-     * temp solution: map<key=unique event ID, value=key-value mapping>
+     * temp solution 1: map<key=unique event ID, value=key-value mapping>
+     * temp solution 2: list<entryDto> (why not sol1? getKey() is barely used)
      * correct solution: radix trie
      */
-    private LinkedHashMap<String, EntryDto> streamMap;
+    private List<EntryDto> streamList;
 
     public StreamDto() {
-        this.streamMap = new LinkedHashMap<>();
+        this.streamList = new ArrayList<>();
     }
 
-    public LinkedHashMap<String, EntryDto> getStreamMap() {
-        return streamMap;
+    public List<EntryDto> getStreamList() {
+        return streamList;
     }
 
-    public void setStreamMap(LinkedHashMap<String, EntryDto> streamMap) {
-        this.streamMap = streamMap;
+    public void setStreamList(List<EntryDto> streamList) {
+        this.streamList = streamList;
     }
 }
