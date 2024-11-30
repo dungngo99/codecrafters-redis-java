@@ -42,4 +42,6 @@ public class OutputConstants {
     public static final String NONE_COMMAND_TYPE_FOR_MISSING_KEY = "none";
     public static final String STREAM_EVENT_ID_SMALLER_OR_EQUAL_THAN_TOP_EVENT_ID_ERROR = "ERR The ID specified in XADD is equal or smaller than the target stream top item";
     public static final String STREAM_EVENT_ID_SMALLER_OR_EQUAL_THAN_0_ERROR = "ERR The ID specified in XADD must be greater than 0-0";
+    public static final Long DEFAULT_TIME_PART_OF_ENTRY_ID = 0L;
+    public static final Long DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID = 0L;
 }
