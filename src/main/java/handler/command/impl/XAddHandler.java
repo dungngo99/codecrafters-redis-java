@@ -67,9 +67,22 @@ public class XAddHandler implements CommandHandler {
     }
 
     private Long[] parseEventId(StreamDto streamDto, String eventId) {
+        LinkedHashMap<String, StreamDto.EntryDto> streamMap = streamDto.getStreamMap();
+
         if (Objects.equals(eventId, OutputConstants.ASTERISK)) {
-            // todo: fully-generated time part and sequence number
-            return new Long[]{0L, 0L};
+            Long currentTimeMS = System.currentTimeMillis();
+            if (streamMap.isEmpty()) {
+                return new Long[]{currentTimeMS, OutputConstants.DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID};
+            } else {
+                Long[] parsedTopEventIdArr = parseTopEventIdFromStreamMap(streamMap);
+                Long topTimePart = parsedTopEventIdArr[0];
+                Long topSequenceNum = parsedTopEventIdArr[1];
+                if (Objects.equals(currentTimeMS, topTimePart)) {
+                    return new Long[]{currentTimeMS, topSequenceNum+1};
+                } else {
+                    return new Long[]{currentTimeMS, OutputConstants.DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID};
+                }
+            }
         }
 
         String[] arr = eventId.split(OutputConstants.DASH_DELIMITER);
@@ -77,7 +90,6 @@ public class XAddHandler implements CommandHandler {
             throw new RuntimeException("invalid param");
         }
 
-        LinkedHashMap<String, StreamDto.EntryDto> streamMap = streamDto.getStreamMap();
         String timePartStr = arr[0];
         long timePart;
         if (Objects.equals(timePartStr, OutputConstants.ASTERISK)) {
