@@ -69,7 +69,7 @@ public class RESPUtils {
                 String str = (String) obj;
                 joiner.add(OutputConstants.DOLLAR_SIZE + str.length());
                 joiner.add(str);
-            } else {
+            } else if (obj instanceof List) {
                 joiner.add(toBulkStringFromNestedList0((List<Object>) obj));
             }
         }

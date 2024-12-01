@@ -1,5 +1,6 @@
 package handler.command.impl;
 
+import constants.OutputConstants;
 import dto.CacheDto;
 import dto.StreamDto;
 import enums.CommandType;
@@ -45,9 +46,21 @@ public class XRangeHandler implements CommandHandler {
         }
 
         String startEventId = (String) list.get(1);
+        Long[] parsedStartEventIds;
+        if (Objects.equals(startEventId, OutputConstants.DEFAULT_START_EVENT_ID)) {
+            parsedStartEventIds = new Long[]{OutputConstants.DEFAULT_TIME_PART_OF_ENTRY_ID, OutputConstants.DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID};
+        } else {
+            parsedStartEventIds = StreamUtils.parseEventId(startEventId);
+        }
+
         String endEventId = (String) list.get(2);
-        Long[] parsedStartEventIds = StreamUtils.parseEventId(startEventId);
-        Long[] parsedEndEventIds = StreamUtils.parseEventId(endEventId);
+        Long[] parsedEndEventIds;
+        if (Objects.equals(endEventId, OutputConstants.DEFAULT_END_EVENT_ID)) {
+            parsedEndEventIds = new Long[]{OutputConstants.DEFAULT_TIME_PART_OF_ENTRY_ID_MAX_VALUE, OutputConstants.DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID_MAX_VALUE};
+        } else {
+            parsedEndEventIds = StreamUtils.parseEventId(endEventId);
+        }
+
         int startEventIndex = StreamUtils.getIndexFromStream(streamList, parsedStartEventIds, false);
         int endEventIndex = StreamUtils.getIndexFromStream(streamList, parsedEndEventIds, true);
         List<StreamDto.EntryDto> rangeStreamList = streamList.subList(startEventIndex, endEventIndex);
