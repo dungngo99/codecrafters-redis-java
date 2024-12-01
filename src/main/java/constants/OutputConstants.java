@@ -48,4 +48,5 @@ public class OutputConstants {
     public static final Long DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID_MAX_VALUE = Long.MAX_VALUE;
     public static final String DEFAULT_START_EVENT_ID = "-";
     public static final String DEFAULT_END_EVENT_ID = "+";
+    public static final String VALID_DIGIT_REGEX_EXPRESSION = "-?\\d+";
 }
