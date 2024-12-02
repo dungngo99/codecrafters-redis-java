@@ -114,4 +114,11 @@ public class StreamUtils {
         List<StreamDto.EntryDto> rangeStreamList = streamList.subList(startEventIndex, endEventIndex);
         return StreamUtils.fromStreamEntryDto(rangeStreamList);
     }
+
+    /**
+     * @param eventId ([time part, sequence number])
+     */
+    public static void incrementEventIdSequenceNumber(Long[] eventId) {
+        eventId[1]++;
+    }
 }

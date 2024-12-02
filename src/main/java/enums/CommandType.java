@@ -23,7 +23,8 @@ public enum CommandType {
     TYPE("type", false),
     XADD("xadd", false),
     XRANGE("xrange", false),
-    XREAD("xread", false);
+    XREAD("xread", false),
+    BLOCK("block", false);
 
     private final String alias;
     private final boolean isWrite;

@@ -49,4 +49,6 @@ public class OutputConstants {
     public static final String DEFAULT_START_EVENT_ID = "-";
     public static final String DEFAULT_END_EVENT_ID = "+";
     public static final String VALID_DIGIT_REGEX_EXPRESSION = "-?\\d+";
+    public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITHOUT_BLOCKING = 1;
+    public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITH_BLOCKING = 3;
 }

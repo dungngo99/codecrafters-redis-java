@@ -58,6 +58,9 @@ public class RESPUtils {
     }
 
     public static String toBulkStringFromNestedList(List<Object> list) {
+        if (list == null || list.isEmpty()) {
+            return getBulkNull();
+        }
         return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
     }
 

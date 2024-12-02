@@ -7,8 +7,13 @@ import service.RESPUtils;
 import service.StreamUtils;
 
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class XReadHandler implements CommandHandler {
     @Override
@@ -21,31 +26,37 @@ public class XReadHandler implements CommandHandler {
         if (list == null || list.size() < 3) {
             throw new RuntimeException("invalid param");
         }
-        List<String> streamKeyList = parseStreamKeyList(list);
-        int streamKeySize = streamKeyList.size();
-        List<String> entryIdList = parseEntryIdList(list, 1+streamKeySize, streamKeySize);
 
-        List<Object> objList = new ArrayList<>();
-        for (int i=0; i<streamKeySize; i++) {
-            String streamKey = streamKeyList.get(i);
-            String entryId = entryIdList.get(i);
-            Long[] parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
-            Long[] parsedEndEventIds = StreamUtils.parseEndEventId(OutputConstants.DEFAULT_END_EVENT_ID);
-
-            List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
-            if (streamListByRange != null) {
-                List<Object> subObjList = new ArrayList<>();
-                subObjList.add(streamKey);
-                subObjList.add(streamListByRange);
-                objList.add(subObjList);
-            }
+        // step 1: check command params if it has block
+        boolean hasBlockCommand;
+        int offset;
+        if (Objects.equals(list.get(0), CommandType.BLOCK.getAlias())) {
+            hasBlockCommand = true;
+            offset = OutputConstants.XREAD_COMMAND_PARAM_OFFSET_WITH_BLOCKING;
+        } else {
+            hasBlockCommand = false;
+            offset = OutputConstants.XREAD_COMMAND_PARAM_OFFSET_WITHOUT_BLOCKING;
         }
+
+        // step 2: parse stream key list and entry id list from command params
+        List<String> streamKeyList = parseStreamKeyList(list, offset);
+        List<String> entryIdList = parseEntryIdList(list, offset+streamKeyList.size(), streamKeyList.size());
+
+        // step 3: separate logic to handle either block or no block
+        List<Object> objList = new ArrayList<>();
+        if (hasBlockCommand) {
+            handleXReadWithBlocking(list, streamKeyList, entryIdList, objList);
+        } else {
+            handleXReadWithoutBlocking(streamKeyList, entryIdList, objList);
+        }
+
+        // step 4: convert to RESP format then return
         return RESPUtils.toBulkStringFromNestedList(objList);
     }
 
-    private List<String> parseStreamKeyList(List list) {
+    private List<String> parseStreamKeyList(List list, int offset) {
         List<String> streamKeyList = new ArrayList<>();
-        int i = 1;
+        int i = offset;
         while (i < list.size()) {
             String entryId = (String) list.get(i++);
             if (StreamUtils.isValidEntryId(entryId)) {
@@ -62,5 +73,76 @@ public class XReadHandler implements CommandHandler {
             entryIdList.add((String) list.get(i));
         }
         return entryIdList;
+    }
+
+    private void handleXReadWithBlocking(List list,
+                                         List<String> streamKeyList,
+                                         List<String> entryIdList,
+                                         List<Object> objList) {
+        Map<Object, Object> orderMap = Collections.synchronizedMap(new LinkedHashMap<>());
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Runnable task = () -> {
+           try {
+               while (true) {
+                   for (int i=0; i<streamKeyList.size(); i++) {
+                       String streamKey = streamKeyList.get(i);
+                       String entryId = entryIdList.get(i);
+                       Long[] parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
+                       Long[] parsedEndEventIds = StreamUtils.parseEndEventId(OutputConstants.DEFAULT_END_EVENT_ID);
+
+                       // workaround to make sure query by range is exclusive
+                       StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
+                       List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
+                       if (streamListByRange != null) {
+                           orderMap.remove(streamKey);
+                           orderMap.put(streamKey, streamListByRange);
+                       }
+                   }
+                   Thread.sleep(Duration.of(OutputConstants.THREAD_SLEEP_100_MICROS, ChronoUnit.MICROS));
+               }
+           } catch (InterruptedException ignore) {
+               // ignore handling exception
+           }
+        };
+
+        Future<?> future = executor.submit(task);
+        try {
+            long timeout = Long.parseLong((String) list.get(1));
+            future.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (Exception ignore) {
+            // ignore handling exception
+        }
+
+        orderMap.forEach((k,v) -> {
+            String castK = (String) k;
+            List<Object> castV = (List<Object>) v;
+            if (Objects.nonNull(castK) && Objects.nonNull(castV) && !castV.isEmpty()) {
+                List<Object> subObjList = new ArrayList<>();
+                subObjList.add(castK);
+                subObjList.add(castV);
+                objList.add(subObjList);
+            }
+        });
+    }
+
+    private void handleXReadWithoutBlocking(List<String> streamKeyList,
+                                            List<String> entryIdList,
+                                            List<Object> objList) {
+        for (int i=0; i<streamKeyList.size(); i++) {
+            String streamKey = streamKeyList.get(i);
+            String entryId = entryIdList.get(i);
+            Long[] parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
+            Long[] parsedEndEventIds = StreamUtils.parseEndEventId(OutputConstants.DEFAULT_END_EVENT_ID);
+
+            // workaround to make sure query by range is exclusive
+            StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
+            List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
+            if (streamListByRange != null && !streamListByRange.isEmpty()) {
+                List<Object> subObjList = new ArrayList<>();
+                subObjList.add(streamKey);
+                subObjList.add(streamListByRange);
+                objList.add(subObjList);
+            }
+        }
     }
 }
