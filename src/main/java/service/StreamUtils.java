@@ -121,4 +121,14 @@ public class StreamUtils {
     public static void incrementEventIdSequenceNumber(Long[] eventId) {
         eventId[1]++;
     }
+
+    public static Long[] getLastEventIds(String streamKey) {
+        CacheDto cacheDto = RedisLocalMap.LOCAL_MAP.get(streamKey);
+        List<StreamDto.EntryDto> streamList = ((StreamDto) cacheDto.getValue()).getStreamList();
+        if (streamList.isEmpty()) {
+            return new Long[]{OutputConstants.DEFAULT_TIME_PART_OF_ENTRY_ID, OutputConstants.DEFAULT_SEQUENCE_NUMBER_OF_ENTRY_ID};
+        }
+        StreamDto.EntryDto lastEntryDto = streamList.getLast();
+        return parseStartEventId(lastEntryDto.getId());
+    }
 }

@@ -83,11 +83,30 @@ public class XReadHandler implements CommandHandler {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Runnable task = () -> {
            try {
+               int streamKeySize = streamKeyList.size();
+
+               // workaround to make sure startEventIds will not be incremented constantly in the sleep loop below
+               List<Long[]> cacheStartEventIdsList = generateDefaultCacheStartEventIds(streamKeySize);
+
                while (true) {
-                   for (int i=0; i<streamKeyList.size(); i++) {
+                   for (int i=0; i<streamKeySize; i++) {
                        String streamKey = streamKeyList.get(i);
                        String entryId = entryIdList.get(i);
-                       Long[] parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
+
+                       Long[] parsedStartEventIds;
+                       if (Objects.equals(entryId, OutputConstants.DOLLAR_SIZE)) {
+                           Long[] cachedStartEventIds = cacheStartEventIdsList.get(i);
+                           if (cachedStartEventIds != null) {
+                               parsedStartEventIds = new Long[]{cachedStartEventIds[0], cachedStartEventIds[1]};
+                           } else {
+                               parsedStartEventIds = StreamUtils.getLastEventIds(streamKey);
+                               Long[] cacheStartEventIds = new Long[]{parsedStartEventIds[0], parsedStartEventIds[1]};
+                               cacheStartEventIdsList.set(i, cacheStartEventIds);
+                           }
+                       } else {
+                           parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
+                       }
+
                        Long[] parsedEndEventIds = StreamUtils.parseEndEventId(OutputConstants.DEFAULT_END_EVENT_ID);
 
                        // workaround to make sure query by range is exclusive
@@ -127,6 +146,14 @@ public class XReadHandler implements CommandHandler {
                 objList.add(subObjList);
             }
         });
+    }
+
+    private List<Long[]> generateDefaultCacheStartEventIds(int streamKeySize) {
+        List<Long[]> cacheStartEventIds = new ArrayList<>();
+        for (int i=0; i<streamKeySize; i++) {
+            cacheStartEventIds.add(null);
+        }
+        return cacheStartEventIds;
     }
 
     private void handleXReadWithoutBlocking(List<String> streamKeyList,
