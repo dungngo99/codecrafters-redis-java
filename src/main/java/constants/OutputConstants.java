@@ -51,4 +51,5 @@ public class OutputConstants {
     public static final String VALID_DIGIT_REGEX_EXPRESSION = "-?\\d+";
     public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITHOUT_BLOCKING = 1;
     public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITH_BLOCKING = 3;
+    public static final Long DEFAULT_XREAD_COMMAND_WAIT_TIME_WITHOUT_BLOCKING_MS = 1000L;
 }

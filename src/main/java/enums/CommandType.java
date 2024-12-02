@@ -21,7 +21,7 @@ public enum CommandType {
     ACK("ack", false),
     WAIT("wait", false),
     TYPE("type", false),
-    XADD("xadd", false),
+    XADD("xadd", true),
     XRANGE("xrange", false),
     XREAD("xread", false),
     BLOCK("block", false);

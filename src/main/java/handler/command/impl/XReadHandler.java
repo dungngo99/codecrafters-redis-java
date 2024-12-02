@@ -108,7 +108,11 @@ public class XReadHandler implements CommandHandler {
         Future<?> future = executor.submit(task);
         try {
             long timeout = Long.parseLong((String) list.get(1));
-            future.get(timeout, TimeUnit.MILLISECONDS);
+            if (timeout > 0) {
+                future.get(timeout, TimeUnit.MILLISECONDS);
+            } else {
+                future.get(OutputConstants.DEFAULT_XREAD_COMMAND_WAIT_TIME_WITHOUT_BLOCKING_MS, TimeUnit.MILLISECONDS);
+            }
         } catch (Exception ignore) {
             // ignore handling exception
         }
