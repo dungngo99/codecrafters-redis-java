@@ -36,7 +36,7 @@ public class IncrHandler implements CommandHandler {
             }
             String val = (String) cacheDto.getValue();
             if (Objects.isNull(val) || !val.matches(OutputConstants.VALID_DIGIT_REGEX_EXPRESSION)) {
-                throw new RuntimeException("unable to apply incr to non-integer value");
+                return RESPUtils.toSimpleError(OutputConstants.INCR_COMMAND_ERROR_NOT_VALID_INT);
             }
         }
         int val = Integer.parseInt((String) cacheDto.getValue());
