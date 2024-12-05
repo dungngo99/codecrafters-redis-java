@@ -24,7 +24,8 @@ public enum CommandType {
     XADD("xadd", true),
     XRANGE("xrange", false),
     XREAD("xread", false),
-    BLOCK("block", false);
+    BLOCK("block", false),
+    INCR("incr", true);
 
     private final String alias;
     private final boolean isWrite;

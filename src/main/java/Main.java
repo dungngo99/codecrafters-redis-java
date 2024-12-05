@@ -56,6 +56,7 @@ public class Main {
         new XAddHandler().register();
         new XRangeHandler().register();
         new XReadHandler().register();
+        new IncrHandler().register();
     }
 
     private void registerRDB() {
