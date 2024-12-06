@@ -1,6 +1,7 @@
 package handler.command.impl;
 
 import constants.OutputConstants;
+import dto.CommandDto;
 import dto.JobDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
@@ -9,6 +10,7 @@ import service.RESPUtils;
 import service.ServerUtils;
 
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ExecHandler implements CommandHandler {
@@ -26,6 +28,11 @@ public class ExecHandler implements CommandHandler {
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
         if (jobDto == null || !jobDto.isCommandAtomic()) {
             return RESPUtils.toSimpleError(OutputConstants.EXEC_WITHOUT_COMMAND_ERROR);
+        }
+        jobDto.setCommandAtomic(Boolean.FALSE);
+        LinkedList<CommandDto> commandDtos = jobDto.getCommandDtoList();
+        if (commandDtos.isEmpty()) {
+            return RESPUtils.toArray(List.of());
         }
         return null;
     }

@@ -10,6 +10,7 @@ import replication.MasterManager;
 
 import java.net.Socket;
 import java.util.List;
+import java.util.Objects;
 
 public class RESPParserUtils {
 
@@ -35,7 +36,7 @@ public class RESPParserUtils {
         // handle queueing commands per multi
         String jobId = ServerUtils.formatIdFromSocket(clientSocket);
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
-        if (jobDto.isCommandAtomic()) {
+        if (jobDto.isCommandAtomic() && !Objects.equals(CommandType.fromAlias(alias), CommandType.EXEC)) {
             return MultiHandler.queueCommand(clientSocket, list);
         }
 
