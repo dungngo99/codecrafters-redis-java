@@ -55,4 +55,6 @@ public class OutputConstants {
     public static final Integer DEFAULT_VALUE_IF_NOT_EXIST_INCR_COMMAND = 0;
     public static final Integer INCREMENT_VALUE_INCR_COMMAND = 1;
     public static final String INCR_COMMAND_ERROR_NOT_VALID_INT = "ERR value is not an integer or out of range";
+    public static final Boolean DEFAULT_VALUE_IS_ATOMIC_PER_JOB = Boolean.FALSE;
+    public static final String RESP_QUEUED_MULTI_COMMAND = "QUEUED";
 }

@@ -57,6 +57,7 @@ public class Main {
         new XRangeHandler().register();
         new XReadHandler().register();
         new IncrHandler().register();
+        new MultiHandler().register();
     }
 
     private void registerRDB() {
@@ -117,6 +118,7 @@ public class Main {
                         .addFreq(OutputConstants.THREAD_SLEEP_100_MICROS)
                         .addSocket(clientSocket)
                         .addTaskQueue()
+                        .addCommandDtoList()
                         .build();
                 new RespHandler().registerJob(jobDto);
             }

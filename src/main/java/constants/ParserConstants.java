@@ -54,4 +54,8 @@ public class ParserConstants {
     // REDIS RDB NUMBER OF EXPIRY BITS
     public static final int NUM_EXPIRY_BITS_SC = 4;
     public static final int NUM_EXPIRY_BITS_MS = 8;
+
+    // REDIS PARSER CONVERTOR
+    public static String ARRAY_ASTERISK_PARSER_CONVERTOR = "arrayAsterisk";
+    public static String DEFAULT_PARSER_CONVERTOR = "default";
 }
