@@ -8,7 +8,7 @@ public class ParserDto<T> {
     private T value;
 
     public ParserDto(Socket socket, T value) {
-        this.socket =  socket;
+        this.socket = socket;
         this.value = value;
     }
     public Socket getSocket() {

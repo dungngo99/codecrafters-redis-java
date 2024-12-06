@@ -26,6 +26,18 @@ public class RESPUtils {
         return joiner.toString();
     }
 
+    public static String toArrayV2(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return getBulkNull();
+        }
+        StringJoiner joiner = new StringJoiner(OutputConstants.EMPTY);
+        joiner.add(OutputConstants.ASTERISK + list.size() + OutputConstants.CRLF);
+        for (String str: list) {
+            joiner.add(str);
+        }
+        return joiner.toString();
+    }
+
     public static String toBulkString(String str) {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
         joiner.add(OutputConstants.DOLLAR_SIZE + str.length());

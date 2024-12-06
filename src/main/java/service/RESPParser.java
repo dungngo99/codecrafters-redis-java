@@ -81,7 +81,7 @@ public class RESPParser {
         byte b = (byte) inputStream.read();
         return switch (b) {
             case ARRAY_ASTERISK -> {
-                ParserDto<List<Object>> parserDto = processNextArray();
+                ParserDto<List<String>> parserDto = processNextArray();
                 yield toStringConvertor.get(ARRAY_ASTERISK_PARSER_CONVERTOR).apply(parserDto);
             }
             case BULK_STRING_DOLLAR_SIGN -> {
@@ -100,10 +100,10 @@ public class RESPParser {
         };
     }
 
-    private ParserDto<List<Object>> processNextArray() throws IOException {
+    private ParserDto<List<String>> processNextArray() throws IOException {
         int size = processNextInt(inputStream);
         inputStream.skipCRLF();
-        List<Object> ans = new ArrayList<>(size);
+        List<String> ans = new ArrayList<>(size);
         for (int i=0; i<size; i++) {
             ans.add(processThenConvert());
         }

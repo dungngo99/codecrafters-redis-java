@@ -18,16 +18,16 @@ public class RESPParserUtils {
         return parserDto.getValue();
     }
 
-    public static String convertList2Str(ParserDto<List<Object>> parserDto) {
+    public static String convertList2Str(ParserDto<List<String>> parserDto) {
         // init
-        List<Object> list = parserDto.getValue();
+        List<String> list = parserDto.getValue();
         Socket clientSocket = parserDto.getSocket();
 
         // pre-check
         if (list.isEmpty() || clientSocket == null) {
             return "";
         }
-        String alias = (String) list.get(0);
+        String alias = list.get(0);
         CommandHandler commandHandler = CommandHandler.HANDLER_MAP.getOrDefault(alias.toLowerCase(), null);
         if (commandHandler == null) {
             return "";

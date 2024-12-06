@@ -3,13 +3,16 @@ package handler.command.impl;
 import constants.OutputConstants;
 import dto.CommandDto;
 import dto.JobDto;
+import dto.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import handler.job.JobHandler;
+import service.RESPParserUtils;
 import service.RESPUtils;
 import service.ServerUtils;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +37,13 @@ public class ExecHandler implements CommandHandler {
         if (commandDtos.isEmpty()) {
             return RESPUtils.toArray(List.of());
         }
-        return null;
+        List<String> respList = new ArrayList<>();
+        while (!commandDtos.isEmpty()) {
+            CommandDto commandDto = commandDtos.poll();
+            ParserDto<List<String>> parserDto = new ParserDto<>(clientSocket, commandDto.getList());
+            String respStr = RESPParserUtils.convertList2Str(parserDto);
+            respList.add(respStr);
+        }
+        return RESPUtils.toArrayV2(respList);
     }
 }

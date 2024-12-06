@@ -3,17 +3,17 @@ package dto;
 import java.util.List;
 
 public class CommandDto {
-    private List list;
+    private List<String> list;
 
-    public CommandDto(List list) {
+    public CommandDto(List<String> list) {
         this.list = list;
     }
 
-    public List getList() {
+    public List<String> getList() {
         return list;
     }
 
-    public void setList(List list) {
+    public void setList(List<String> list) {
         this.list = list;
     }
 }

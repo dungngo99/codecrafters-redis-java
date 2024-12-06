@@ -30,7 +30,7 @@ public class MultiHandler implements CommandHandler {
         return RESPUtils.getRESPOk();
     }
 
-    public static String queueCommand(Socket clientSocket, List list) {
+    public static String queueCommand(Socket clientSocket, List<String> list) {
         String jobId = ServerUtils.formatIdFromSocket(clientSocket);
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
         LinkedList<CommandDto> commandDtoList = jobDto.getCommandDtoList();
