@@ -58,6 +58,7 @@ public class Main {
         new XReadHandler().register();
         new IncrHandler().register();
         new MultiHandler().register();
+        new ExecHandler().register();
     }
 
     private void registerRDB() {

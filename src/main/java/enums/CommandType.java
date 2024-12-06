@@ -26,7 +26,8 @@ public enum CommandType {
     XREAD("xread", false),
     BLOCK("block", false),
     INCR("incr", true),
-    MULTI("multi", false);
+    MULTI("multi", false),
+    EXEC("exec", false);
 
     private final String alias;
     private final boolean isWrite;
