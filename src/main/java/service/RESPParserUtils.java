@@ -36,7 +36,9 @@ public class RESPParserUtils {
         // handle queueing commands per multi
         String jobId = ServerUtils.formatIdFromSocket(clientSocket);
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
-        if (jobDto.isCommandAtomic() && !Objects.equals(CommandType.fromAlias(alias), CommandType.EXEC)) {
+        if (jobDto.isCommandAtomic()
+                && !Objects.equals(CommandType.fromAlias(alias), CommandType.EXEC)
+                && !Objects.equals(CommandType.fromAlias(alias), CommandType.DISCARD)) {
             return MultiHandler.queueCommand(clientSocket, list);
         }
 

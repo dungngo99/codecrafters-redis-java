@@ -27,7 +27,8 @@ public enum CommandType {
     BLOCK("block", false),
     INCR("incr", true),
     MULTI("multi", false),
-    EXEC("exec", false);
+    EXEC("exec", false),
+    DISCARD("discard", false);
 
     private final String alias;
     private final boolean isWrite;

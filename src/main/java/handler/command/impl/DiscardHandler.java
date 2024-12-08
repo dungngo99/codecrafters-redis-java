@@ -3,23 +3,20 @@ package handler.command.impl;
 import constants.OutputConstants;
 import dto.CommandDto;
 import dto.JobDto;
-import dto.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import handler.job.JobHandler;
-import service.RESPParserUtils;
 import service.RESPUtils;
 import service.ServerUtils;
 
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExecHandler implements CommandHandler {
+public class DiscardHandler implements CommandHandler {
     @Override
     public void register() {
-        CommandHandler.HANDLER_MAP.put(CommandType.EXEC.getAlias(), this);
+        CommandHandler.HANDLER_MAP.put(CommandType.DISCARD.getAlias(), this);
     }
 
     @Override
@@ -30,20 +27,13 @@ public class ExecHandler implements CommandHandler {
         String jobId = ServerUtils.formatIdFromSocket(clientSocket);
         JobDto jobDto = JobHandler.JOB_MAP.get(jobId);
         if (jobDto == null || !jobDto.isCommandAtomic()) {
-            return RESPUtils.toSimpleError(OutputConstants.EXEC_WITHOUT_MULTI_COMMAND_ERROR);
+            return RESPUtils.toSimpleError(OutputConstants.DISCARD_WITHOUT_MULTI_COMMAND_ERROR);
         }
         jobDto.setCommandAtomic(Boolean.FALSE);
         LinkedList<CommandDto> commandDtos = jobDto.getCommandDtoList();
-        if (commandDtos.isEmpty()) {
-            return RESPUtils.toArray(List.of());
-        }
-        List<String> respList = new ArrayList<>();
         while (!commandDtos.isEmpty()) {
-            CommandDto commandDto = commandDtos.poll();
-            ParserDto<List<String>> parserDto = new ParserDto<>(clientSocket, commandDto.getList());
-            String respStr = RESPParserUtils.convertList2Str(parserDto);
-            respList.add(respStr);
+            commandDtos.remove();
         }
-        return RESPUtils.toArrayV2(respList);
+        return RESPUtils.getRESPOk();
     }
 }

@@ -57,5 +57,6 @@ public class OutputConstants {
     public static final String INCR_COMMAND_ERROR_NOT_VALID_INT = "ERR value is not an integer or out of range";
     public static final Boolean DEFAULT_VALUE_IS_ATOMIC_PER_JOB = Boolean.FALSE;
     public static final String RESP_QUEUED_MULTI_COMMAND = "QUEUED";
-    public static final String EXEC_WITHOUT_COMMAND_ERROR = "ERR EXEC without MULTI";
+    public static final String EXEC_WITHOUT_MULTI_COMMAND_ERROR = "ERR EXEC without MULTI";
+    public static final String DISCARD_WITHOUT_MULTI_COMMAND_ERROR = "ERR DISCARD without MULTI";
 }

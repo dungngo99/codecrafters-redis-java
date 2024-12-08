@@ -59,6 +59,7 @@ public class Main {
         new IncrHandler().register();
         new MultiHandler().register();
         new ExecHandler().register();
+        new DiscardHandler().register();
     }
 
     private void registerRDB() {
