@@ -31,6 +31,63 @@ The Redis Serialization Protocol (<strong>RESP</strong>) is the core communicati
 
 <hr />
 
+<h2>Replication 101</h2>
+
+<p>
+Redis replication is the foundation for high availability and failover. A <strong>Master node</strong> handles both read and write requests, 
+while <strong>Replica nodes</strong> serve read-only requests. When clients send writes to the Master, it propagates the changes to all connected Replicas as a stream of bytes.
+</p>
+
+<p>There are two main aspects of replication:</p>
+<ul>
+  <li>
+    <strong>Full sync vs. Partial sync:</strong>  
+    - After a disconnection or crash, a Replica may request a <em>partial sync</em> if its local state is still within the Master’s backlog buffer.  
+    - If not possible, the Replica requests a <em>full sync</em>, where the Master generates an RDB snapshot and transfers it as a byte stream.
+  </li>
+  <li>
+    <strong>Asynchronous vs. Synchronous syncing:</strong>  
+    - In <em>asynchronous</em> replication, the Master sends updates in the background without waiting for Replica acknowledgments.  
+    - In <em>synchronous</em> replication, the Master waits for acknowledgments from <em>N</em> Replicas before confirming a write.
+  </li>
+</ul>
+
+<hr />
+
+<h2>Replication Mechanism</h2>
+
+<p>
+Redis replication relies on a well-defined ID and offset system to track dataset versions and synchronize efficiently.
+</p>
+
+<ul>
+  <li>
+    <strong>Replication ID and Offset:</strong>  
+    Each Master maintains a unique <code>replication ID</code> (40-character string) and an <code>offset</code>.  
+    Every client write increases the Master’s offset, which is used to determine how Replicas catch up.
+  </li>
+  <li>
+    <strong>PSYNC Command:</strong>  
+    Replicas use <code>PSYNC</code> to request synchronization. If their offset falls within the Master’s backlog buffer, the Master sends only the missing byte stream. Otherwise, a full sync is performed.
+  </li>
+  <li>
+    <strong>Replication Steps (Master → Replica):</strong>
+    <ol>
+      <li>The Master spawns a background process to create an RDB snapshot, while buffering client commands in parallel.</li>
+      <li>The snapshot (RDB file) is transferred to the Replica and loaded into memory.</li>
+      <li>The buffered command stream is sent over (using RESP protocol) to bring the Replica fully up to date.</li>
+    </ol>
+  </li>
+  <li>
+    <strong>Efficiency:</strong>  
+    If multiple Replicas reconnect at once, the Master reuses a single background save to serve them all, reducing overhead.
+  </li>
+  <li>
+    <strong>Auto-reconnect:</strong>  
+    Replicas can automatically reconnect and resynchronize when the Master–Replica link is interrupted.
+  </li>
+</ul>
+
 <h2>Redis Use Cases</h2>
 
 <p>
