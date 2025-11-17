@@ -80,7 +80,7 @@ public class XReadHandler implements CommandHandler {
                                          List<String> entryIdList,
                                          List<Object> objList) {
         Map<Object, Object> orderMap = Collections.synchronizedMap(new LinkedHashMap<>());
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+
         Runnable task = () -> {
            try {
                int streamKeySize = streamKeyList.size();
@@ -88,7 +88,7 @@ public class XReadHandler implements CommandHandler {
                // workaround to make sure startEventIds will not be incremented constantly in the sleep loop below
                List<Long[]> cachedStartEventIdsList = generateDefaultCacheStartEventIds(streamKeySize);
 
-               while (true) {
+               outerLoop: while (true) {
                    for (int i=0; i<streamKeySize; i++) {
                        String streamKey = streamKeyList.get(i);
                        String entryId = entryIdList.get(i);
@@ -112,10 +112,10 @@ public class XReadHandler implements CommandHandler {
                        // workaround to make sure query by range is exclusive
                        StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
                        List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
-                       if (streamListByRange != null) {
+                       if (streamListByRange != null && !streamListByRange.isEmpty()) {
                            orderMap.remove(streamKey);
                            orderMap.put(streamKey, streamListByRange);
-                           break;
+                           break outerLoop;
                        }
                    }
                    Thread.sleep(Duration.of(OutputConstants.THREAD_SLEEP_100_MICROS, ChronoUnit.MICROS));
@@ -128,11 +128,13 @@ public class XReadHandler implements CommandHandler {
         try {
             long timeout = Long.parseLong((String) list.get(1));
             if (timeout > 0) {
+                ExecutorService executor = Executors.newSingleThreadExecutor();
                 Future<?> future = executor.submit(task);
                 future.get(timeout, TimeUnit.MILLISECONDS);
             } else {
                 // this client will be blocked indefinitely until a new entry is added
-                executor.execute(task);
+                // due to the task's busy-spinning
+                task.run();
             }
         } catch (Exception ignore) {
             // ignore handling exception
