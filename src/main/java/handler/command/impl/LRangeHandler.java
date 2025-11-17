@@ -40,7 +40,7 @@ public class LRangeHandler implements CommandHandler {
         if (storedList.size() <= start || end < start) {
             return RESPUtils.getEmptyArray();
         }
-        List<Object> storedSubList = storedList.subList(start, Math.max(end+1, storedList.size()));
+        List<Object> storedSubList = storedList.subList(start, Math.min(end+1, storedList.size()));
 
         List<String> valueList = new ArrayList<>();
         for (Object o: storedSubList) {
