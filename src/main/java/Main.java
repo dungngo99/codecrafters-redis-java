@@ -60,6 +60,7 @@ public class Main {
         new MultiHandler().register();
         new ExecHandler().register();
         new DiscardHandler().register();
+        new RPushHandler().register();
     }
 
     private void registerRDB() {
