@@ -36,6 +36,7 @@ public class RPushHandler implements CommandHandler {
             cache = new CacheDto();
             cache.setValueType(ValueType.LIST);
             cache.setValue(new ArrayList<>());
+            RedisLocalMap.LOCAL_MAP.put(key, cache);
         }
 
         List<Object> storedList = (List<Object>) cache.getValue();
