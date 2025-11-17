@@ -51,7 +51,6 @@ public class OutputConstants {
     public static final String VALID_DIGIT_REGEX_EXPRESSION = "-?\\d+";
     public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITHOUT_BLOCKING = 1;
     public static final Integer XREAD_COMMAND_PARAM_OFFSET_WITH_BLOCKING = 3;
-    public static final Long DEFAULT_XREAD_COMMAND_WAIT_TIME_WITHOUT_BLOCKING_MS = 1000L;
     public static final Integer DEFAULT_VALUE_IF_NOT_EXIST_INCR_COMMAND = 0;
     public static final Integer INCREMENT_VALUE_INCR_COMMAND = 1;
     public static final String INCR_COMMAND_ERROR_NOT_VALID_INT = "ERR value is not an integer or out of range";

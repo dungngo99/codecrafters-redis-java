@@ -115,6 +115,7 @@ public class XReadHandler implements CommandHandler {
                        if (streamListByRange != null && !streamListByRange.isEmpty()) {
                            orderMap.remove(streamKey);
                            orderMap.put(streamKey, streamListByRange);
+                           break;
                        }
                    }
                    Thread.sleep(Duration.of(OutputConstants.THREAD_SLEEP_100_MICROS, ChronoUnit.MICROS));
@@ -124,13 +125,14 @@ public class XReadHandler implements CommandHandler {
            }
         };
 
-        Future<?> future = executor.submit(task);
         try {
             long timeout = Long.parseLong((String) list.get(1));
             if (timeout > 0) {
+                Future<?> future = executor.submit(task);
                 future.get(timeout, TimeUnit.MILLISECONDS);
             } else {
-                future.get(OutputConstants.DEFAULT_XREAD_COMMAND_WAIT_TIME_WITHOUT_BLOCKING_MS, TimeUnit.MILLISECONDS);
+                // this client will be blocked indefinitely until a new entry is added
+                executor.execute(task);
             }
         } catch (Exception ignore) {
             // ignore handling exception
