@@ -24,7 +24,10 @@ public class RPushHandler implements CommandHandler {
         }
 
         String key = (String) list.get(0);
-        Object value = list.get(1);
+        List<Object> valueList = new ArrayList<>();
+        for (int i=1; i<list.size(); i++) {
+            valueList.add(list.get(i));
+        }
 
         CacheDto cache;
         if (RedisLocalMap.LOCAL_MAP.containsKey(key)) {
@@ -40,7 +43,7 @@ public class RPushHandler implements CommandHandler {
         }
 
         List<Object> storedList = (List<Object>) cache.getValue();
-        storedList.add(value);
+        storedList.addAll(valueList);
 
         return RESPUtils.toSimpleInt(storedList.size());
     }
