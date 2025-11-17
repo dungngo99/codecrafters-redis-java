@@ -71,7 +71,7 @@ public class RESPUtils {
 
     public static String toBulkStringFromNestedList(List<Object> list) {
         if (list == null || list.isEmpty()) {
-            return getBulkNull();
+            return getBulkNullArray();
         }
         return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
     }
@@ -106,6 +106,12 @@ public class RESPUtils {
     public static String getBulkNull() {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
         joiner.add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
+        return joiner.toString();
+    }
+
+    public static String getBulkNullArray() {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
+        joiner.add(OutputConstants.ASTERISK + OutputConstants.NULL_BULK);
         return joiner.toString();
     }
 

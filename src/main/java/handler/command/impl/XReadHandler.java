@@ -86,7 +86,7 @@ public class XReadHandler implements CommandHandler {
                int streamKeySize = streamKeyList.size();
 
                // workaround to make sure startEventIds will not be incremented constantly in the sleep loop below
-               List<Long[]> cacheStartEventIdsList = generateDefaultCacheStartEventIds(streamKeySize);
+               List<Long[]> cachedStartEventIdsList = generateDefaultCacheStartEventIds(streamKeySize);
 
                while (true) {
                    for (int i=0; i<streamKeySize; i++) {
@@ -95,13 +95,13 @@ public class XReadHandler implements CommandHandler {
 
                        Long[] parsedStartEventIds;
                        if (Objects.equals(entryId, OutputConstants.DOLLAR_SIZE)) {
-                           Long[] cachedStartEventIds = cacheStartEventIdsList.get(i);
+                           Long[] cachedStartEventIds = cachedStartEventIdsList.get(i);
                            if (cachedStartEventIds != null) {
                                parsedStartEventIds = new Long[]{cachedStartEventIds[0], cachedStartEventIds[1]};
                            } else {
                                parsedStartEventIds = StreamUtils.getLastEventIds(streamKey);
-                               Long[] cacheStartEventIds = new Long[]{parsedStartEventIds[0], parsedStartEventIds[1]};
-                               cacheStartEventIdsList.set(i, cacheStartEventIds);
+                               Long[] newCachedStartEventIds = new Long[]{parsedStartEventIds[0], parsedStartEventIds[1]};
+                               cachedStartEventIdsList.set(i, newCachedStartEventIds);
                            }
                        } else {
                            parsedStartEventIds = StreamUtils.parseStartEventId(entryId);
@@ -112,7 +112,7 @@ public class XReadHandler implements CommandHandler {
                        // workaround to make sure query by range is exclusive
                        StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
                        List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
-                       if (streamListByRange != null) {
+                       if (streamListByRange != null && !streamListByRange.isEmpty()) {
                            orderMap.remove(streamKey);
                            orderMap.put(streamKey, streamListByRange);
                        }
