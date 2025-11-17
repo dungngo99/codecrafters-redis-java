@@ -100,7 +100,7 @@ public class RESPUtils {
     }
 
     public static String getRESPEcho(String echo) {
-        return toSimpleString(echo);
+        return toBulkString(echo);
     }
 
     public static String getBulkNull() {
