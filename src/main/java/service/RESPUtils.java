@@ -115,6 +115,12 @@ public class RESPUtils {
         return joiner.toString();
     }
 
+    public static String getEmptyArray() {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
+        joiner.add(OutputConstants.ASTERISK + OutputConstants.LRANGE_EMPTY_ARRAY_LENGTH);
+        return joiner.toString();
+    }
+
     public static String getRESPOk() {
         return toSimpleString(OutputConstants.OK);
     }

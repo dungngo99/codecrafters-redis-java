@@ -61,6 +61,7 @@ public class Main {
         new ExecHandler().register();
         new DiscardHandler().register();
         new RPushHandler().register();
+        new LRangeHandler().register();
     }
 
     private void registerRDB() {
