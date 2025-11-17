@@ -14,8 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class XReadHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(XReadHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.XREAD.getAlias(), this);
@@ -111,6 +114,8 @@ public class XReadHandler implements CommandHandler {
 
                        // workaround to make sure query by range is exclusive
                        StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
+                       logger.info(String.format("handleXReadWithBlocking: start=%s; end=%s",
+                               Arrays.toString(parsedStartEventIds), Arrays.toString(parsedEndEventIds)));
                        List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
                        if (streamListByRange != null && !streamListByRange.isEmpty()) {
                            orderMap.remove(streamKey);
