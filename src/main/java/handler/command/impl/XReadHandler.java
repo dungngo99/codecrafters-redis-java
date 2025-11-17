@@ -112,7 +112,7 @@ public class XReadHandler implements CommandHandler {
                        // workaround to make sure query by range is exclusive
                        StreamUtils.incrementEventIdSequenceNumber(parsedStartEventIds);
                        List<Object> streamListByRange = StreamUtils.getStreamListByRange(streamKey, parsedStartEventIds, parsedEndEventIds);
-                       if (streamListByRange != null && !streamListByRange.isEmpty()) {
+                       if (streamListByRange != null) {
                            orderMap.remove(streamKey);
                            orderMap.put(streamKey, streamListByRange);
                            break;
