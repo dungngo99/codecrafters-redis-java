@@ -29,8 +29,9 @@ public enum CommandType {
     MULTI("multi", false),
     EXEC("exec", false),
     DISCARD("discard", false),
-    RPUSH("rpush", false),
-    LRANGE("lrange", false);
+    RPUSH("rpush", true),
+    LRANGE("lrange", false),
+    LPUSH("lpush", true);
 
     private final String alias;
     private final boolean isWrite;
