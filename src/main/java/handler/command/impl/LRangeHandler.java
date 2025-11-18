@@ -33,7 +33,7 @@ public class LRangeHandler implements CommandHandler {
 
         CacheDto cacheDto = RedisLocalMap.LOCAL_MAP.get(key);
         if (!ValueType.isList(cacheDto.getValueType()) || !(cacheDto.getValue() instanceof List<?>)) {
-            throw new RuntimeException("RPushHandler: command not applied to stored value");
+            throw new RuntimeException("LRangeHandler: command not applied to stored value");
         }
 
         List<Object> storedList = (List<Object>) cacheDto.getValue();
