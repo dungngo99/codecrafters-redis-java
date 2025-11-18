@@ -8,6 +8,7 @@ import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LPopHandler implements CommandHandler {
@@ -37,6 +38,24 @@ public class LPopHandler implements CommandHandler {
             return RESPUtils.getBulkNullString();
         }
 
+        boolean hasOptArg = list.size() == 2;
+        if (hasOptArg) {
+            int numsToRemove = Integer.parseInt((String) list.get(1));
+            return processWithOptArg(cacheValue, numsToRemove);
+        } else {
+            return processWithoutOptArg(cacheValue);
+        }
+    }
+
+    private String processWithOptArg(List<?> cacheValue, int numsToRemove) {
+        List<String> removedNums = new ArrayList<>();
+        for (int i=0; i<Math.min(numsToRemove, cacheValue.size()); i++) {
+            removedNums.add((String) cacheValue.removeFirst());
+        }
+        return RESPUtils.toArray(removedNums);
+    }
+
+    private String processWithoutOptArg(List<?> cacheValue) {
         String removedValue = (String) cacheValue.removeFirst();
         return RESPUtils.toBulkString(removedValue);
     }
