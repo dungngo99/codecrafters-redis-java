@@ -37,10 +37,14 @@ public class LRangeHandler implements CommandHandler {
         }
 
         List<Object> storedList = (List<Object>) cacheDto.getValue();
+        int storedListLength = storedList.size();
+
+        start = start >= 0 ? start : (Math.abs(start) >= storedListLength ? 0 : storedListLength + start);
+        end = end >= 0 ? end : (Math.abs(end) > storedListLength ? 0 : storedListLength + end);
         if (storedList.size() <= start || end < start) {
             return RESPUtils.getEmptyArray();
         }
-        List<Object> storedSubList = storedList.subList(start, Math.min(end+1, storedList.size()));
+        List<Object> storedSubList = storedList.subList(start, Math.min(end+1, storedListLength));
 
         List<String> valueList = new ArrayList<>();
         for (Object o: storedSubList) {
