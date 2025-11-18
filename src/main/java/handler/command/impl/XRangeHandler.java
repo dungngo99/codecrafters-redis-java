@@ -1,6 +1,5 @@
 package handler.command.impl;
 
-import constants.OutputConstants;
 import dto.CacheDto;
 import dto.StreamDto;
 import enums.CommandType;
@@ -37,12 +36,12 @@ public class XRangeHandler implements CommandHandler {
         if (Objects.isNull(cacheDto)
                 || !Objects.equals(cacheDto.getValueType(), ValueType.STREAM)
                 || Objects.isNull(cacheDto.getValue())) {
-            return RESPUtils.getBulkNull();
+            return RESPUtils.getBulkNullString();
         }
 
         List<StreamDto.EntryDto> streamList = ((StreamDto) cacheDto.getValue()).getStreamList();
         if (streamList.isEmpty()) {
-            return RESPUtils.getBulkNull();
+            return RESPUtils.getBulkNullString();
         }
 
         String startEventId = (String) list.get(1);

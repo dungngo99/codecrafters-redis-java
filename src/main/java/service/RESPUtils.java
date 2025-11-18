@@ -28,7 +28,7 @@ public class RESPUtils {
 
     public static String toArrayV2(List<String> list) {
         if (list == null || list.isEmpty()) {
-            return getBulkNull();
+            return getBulkNullString();
         }
         StringJoiner joiner = new StringJoiner(OutputConstants.EMPTY);
         joiner.add(OutputConstants.ASTERISK + list.size() + OutputConstants.CRLF);
@@ -103,7 +103,7 @@ public class RESPUtils {
         return toBulkString(echo);
     }
 
-    public static String getBulkNull() {
+    public static String getBulkNullString() {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
         joiner.add(OutputConstants.DOLLAR_SIZE + OutputConstants.NULL_BULK);
         return joiner.toString();

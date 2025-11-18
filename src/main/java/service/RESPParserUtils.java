@@ -58,6 +58,6 @@ public class RESPParserUtils {
         }
 
         // return
-        return val != null ? val : RESPUtils.getBulkNull();
+        return val != null ? val : RESPUtils.getBulkNullString();
     }
 }

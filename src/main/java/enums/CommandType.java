@@ -32,7 +32,8 @@ public enum CommandType {
     RPUSH("rpush", true),
     LRANGE("lrange", false),
     LPUSH("lpush", true),
-    LLEN("llen", false);
+    LLEN("llen", false),
+    LPOP("lpop", true);
 
     private final String alias;
     private final boolean isWrite;
