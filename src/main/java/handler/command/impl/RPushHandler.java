@@ -34,7 +34,7 @@ public class RPushHandler implements CommandHandler {
         CacheDto cache;
         if (RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             cache = RedisLocalMap.LOCAL_MAP.get(key);
-            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof Collection<?> cacheValue)) {
+            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof Collection<?>)) {
                 throw new RuntimeException("RPushHandler: command not applied to stored value");
             }
         } else {
