@@ -80,12 +80,14 @@ public class BLPopHandler implements CommandHandler {
 
         while (true) {
             try {
+                logger.info("processWithZeroTimeout0: begin waiting block-list queue to take first conn");
                 BlockListDto blockListDto = BLOCK_LIST_QUEUE.takeFirst();
                 Socket socket = blockListDto.getSocket();
                 String key = blockListDto.getKey();
 
                 CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
                 LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
+                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take first value with key=" + key);
                 String value = (String) storedList.takeFirst();
 
                 ServerUtils.writeThenFlushString(socket, RESPUtils.toArray(List.of(key, value)));
