@@ -111,6 +111,7 @@ public class BLPopHandler implements CommandHandler {
             logger.warning("processWithNonzeroTimeout: failed due to " + ex.getMessage());
         }
 
+        logger.info("processWithNonzeroTimeout: done, return value.");
         if (value == null) {
             return RESPUtils.getBulkNullArray();
         } else {
