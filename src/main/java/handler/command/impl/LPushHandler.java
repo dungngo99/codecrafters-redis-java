@@ -8,8 +8,9 @@ import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class LPushHandler implements CommandHandler {
     @Override
@@ -28,17 +29,17 @@ public class LPushHandler implements CommandHandler {
         CacheDto cache;
         if (RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             cache = RedisLocalMap.LOCAL_MAP.get(key);
-            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof List<?>)) {
+            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof Collection<?>)) {
                 throw new RuntimeException("RPushHandler: command not applied to stored value");
             }
         } else {
             cache = new CacheDto();
             cache.setValueType(ValueType.LIST);
-            cache.setValue(new LinkedList<>());
+            cache.setValue(new LinkedBlockingDeque<>());
             RedisLocalMap.LOCAL_MAP.put(key, cache);
         }
 
-        LinkedList<Object> storedList = (LinkedList<Object>) cache.getValue();
+        LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
         for (int i=1; i<list.size(); i++) {
             storedList.addFirst(list.get(i));
         }

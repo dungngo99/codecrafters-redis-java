@@ -65,6 +65,7 @@ public class Main {
         new LPushHandler().register();
         new LLenHandler().register();
         new LPopHandler().register();
+        new BLPopHandler().register();
     }
 
     private void registerRDB() {

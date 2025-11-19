@@ -9,7 +9,10 @@ import service.RedisLocalMap;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class LRangeHandler implements CommandHandler {
     @Override
@@ -32,11 +35,11 @@ public class LRangeHandler implements CommandHandler {
         }
 
         CacheDto cacheDto = RedisLocalMap.LOCAL_MAP.get(key);
-        if (!ValueType.isList(cacheDto.getValueType()) || !(cacheDto.getValue() instanceof List<?>)) {
+        if (!ValueType.isList(cacheDto.getValueType()) || !(cacheDto.getValue() instanceof BlockingDeque<?>)) {
             throw new RuntimeException("LRangeHandler: command not applied to stored value");
         }
 
-        List<Object> storedList = (List<Object>) cacheDto.getValue();
+        LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cacheDto.getValue();
         int storedListLength = storedList.size();
 
         start = start >= 0 ? start : (Math.abs(start) >= storedListLength ? 0 : storedListLength + start);
@@ -44,11 +47,15 @@ public class LRangeHandler implements CommandHandler {
         if (storedList.size() <= start || end < start) {
             return RESPUtils.getEmptyArray();
         }
-        List<Object> storedSubList = storedList.subList(start, Math.min(end+1, storedListLength));
+
+        Iterator<Object> iter = storedList.iterator();
+        for (int i=0; i<start; i++) {
+            iter.next();
+        }
 
         List<String> valueList = new ArrayList<>();
-        for (Object o: storedSubList) {
-            valueList.add((String) o);
+        for (int i=start; i<Math.min(end+1, storedListLength); i++) {
+            valueList.add((String) iter.next());
         }
 
         return RESPUtils.toArray(valueList);

@@ -9,7 +9,9 @@ import service.RedisLocalMap;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class RPushHandler implements CommandHandler {
     @Override
@@ -32,19 +34,21 @@ public class RPushHandler implements CommandHandler {
         CacheDto cache;
         if (RedisLocalMap.LOCAL_MAP.containsKey(key)) {
             cache = RedisLocalMap.LOCAL_MAP.get(key);
-            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof List<?>)) {
+            if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof Collection<?> cacheValue)) {
                 throw new RuntimeException("RPushHandler: command not applied to stored value");
             }
         } else {
             cache = new CacheDto();
             cache.setValueType(ValueType.LIST);
-            cache.setValue(new ArrayList<>());
+            cache.setValue(new LinkedBlockingDeque<>());
             RedisLocalMap.LOCAL_MAP.put(key, cache);
         }
 
-        List<Object> storedList = (List<Object>) cache.getValue();
-        storedList.addAll(valueList);
+        LinkedBlockingDeque<Object> cacheValue = (LinkedBlockingDeque<Object>) cache.getValue();
+        for (int i=1; i<list.size(); i++) {
+            cacheValue.addLast(list.get(i));
+        }
 
-        return RESPUtils.toSimpleInt(storedList.size());
+        return RESPUtils.toSimpleInt(cacheValue.size());
     }
 }

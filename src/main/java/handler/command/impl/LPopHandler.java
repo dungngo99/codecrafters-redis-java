@@ -10,6 +10,7 @@ import service.RedisLocalMap;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingDeque;
 
 public class LPopHandler implements CommandHandler {
     @Override
@@ -30,7 +31,7 @@ public class LPopHandler implements CommandHandler {
         }
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
-        if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof List<?> cacheValue)) {
+        if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof BlockingDeque<?> cacheValue)) {
             throw new RuntimeException("LLenHandler: command not applied to stored value");
         }
 
@@ -47,7 +48,7 @@ public class LPopHandler implements CommandHandler {
         }
     }
 
-    private String processWithOptArg(List<?> cacheValue, int numsToRemove) {
+    private String processWithOptArg(BlockingDeque<?> cacheValue, int numsToRemove) {
         List<String> removedNums = new ArrayList<>();
         for (int i=0; i<Math.min(numsToRemove, cacheValue.size()); i++) {
             removedNums.add((String) cacheValue.removeFirst());
@@ -55,7 +56,7 @@ public class LPopHandler implements CommandHandler {
         return RESPUtils.toArray(removedNums);
     }
 
-    private String processWithoutOptArg(List<?> cacheValue) {
+    private String processWithoutOptArg(BlockingDeque<?> cacheValue) {
         String removedValue = (String) cacheValue.removeFirst();
         return RESPUtils.toBulkString(removedValue);
     }

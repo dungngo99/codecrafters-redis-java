@@ -8,6 +8,7 @@ import service.RESPUtils;
 import service.RedisLocalMap;
 
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
 
 public class LLenHandler implements CommandHandler {
@@ -29,7 +30,7 @@ public class LLenHandler implements CommandHandler {
         }
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
-        if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof List<?> cacheValue)) {
+        if (!ValueType.isList(cache.getValueType()) || !(cache.getValue() instanceof Collection<?> cacheValue)) {
             throw new RuntimeException("LLenHandler: command not applied to stored value");
         }
 

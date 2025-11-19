@@ -59,4 +59,5 @@ public class OutputConstants {
     public static final String EXEC_WITHOUT_MULTI_COMMAND_ERROR = "ERR EXEC without MULTI";
     public static final String DISCARD_WITHOUT_MULTI_COMMAND_ERROR = "ERR DISCARD without MULTI";
     public static final Integer LRANGE_EMPTY_ARRAY_LENGTH = 0;
+    public static final Integer SECOND_TO_MILLISECOND = 1000;
 }
