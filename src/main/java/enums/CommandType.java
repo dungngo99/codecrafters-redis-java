@@ -34,7 +34,8 @@ public enum CommandType {
     LPUSH("lpush", true),
     LLEN("llen", false),
     LPOP("lpop", true),
-    BLPOP("blpop", true);
+    BLPOP("blpop", true),
+    SUBSCRIBE("subscribe", true);
 
     private final String alias;
     private final boolean isWrite;

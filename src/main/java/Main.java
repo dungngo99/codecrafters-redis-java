@@ -66,6 +66,7 @@ public class Main {
         new LLenHandler().register();
         new LPopHandler().register();
         new BLPopHandler().register();
+        new SubscribeHandler().register();
     }
 
     private void registerRDB() {
