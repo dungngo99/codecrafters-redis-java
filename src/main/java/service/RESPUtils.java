@@ -86,6 +86,8 @@ public class RESPUtils {
                 joiner.add(str);
             } else if (obj instanceof List) {
                 joiner.add(toBulkStringFromNestedList0((List<Object>) obj));
+            } else if (obj instanceof Integer) {
+                joiner.add(OutputConstants.COLON_DELIMITER + obj);
             }
         }
         return joiner.toString();

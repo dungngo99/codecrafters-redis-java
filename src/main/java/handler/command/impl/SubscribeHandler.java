@@ -59,10 +59,10 @@ public class SubscribeHandler implements CommandHandler {
             channelMap.put(channelName, channelDto);
         }
 
-        List<String> responseList = List.of(
+        List<Object> responseList = List.of(
                 CommandType.SUBSCRIBE.getAlias(),
                 channelName,
-                Integer.toString(channelMap.size()));
-        return RESPUtils.toArray(responseList);
+                channelMap.size());
+        return RESPUtils.toBulkStringFromNestedList(responseList);
     }
 }
