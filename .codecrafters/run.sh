@@ -8,4 +8,6 @@
 
 set -e # Exit on failure
 
+jar tf /tmp/codecrafters-build-redis-java/java_redis.jar | grep -i main
+
 exec java -jar /tmp/codecrafters-build-redis-java/java_redis.jar "$@"

@@ -14,8 +14,10 @@ set -e # Exit early if any commands fail
 # - Edit .codecrafters/compile.sh to change how your program compiles remotely
 (
   cd "$(dirname "$0")" # Ensure compile steps are run within the repository directory
-  mvn -B package -Ddir=/tmp/codecrafters-build-redis-java
+  mvn -B clean package -Ddir=/tmp/codecrafters-build-redis-java
 )
+
+jar tf /tmp/codecrafters-build-redis-java/java_redis.jar | grep -i main
 
 # Copied from .codecrafters/run.sh
 #
