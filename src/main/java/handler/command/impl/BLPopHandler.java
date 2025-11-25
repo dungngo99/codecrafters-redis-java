@@ -62,9 +62,8 @@ public class BLPopHandler implements CommandHandler {
     }
 
     private String processWithZeroTimeout(Socket clientSocket, String key) {
-        if (!IS_SPAWN_CHILD_THREAD.get()) {
+        if (IS_SPAWN_CHILD_THREAD.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
             new Thread(this::processWithZeroTimeout0).start();
-            IS_SPAWN_CHILD_THREAD.set(Boolean.TRUE);
         }
         BlockListDto blockListDto = new BlockListDto();
         blockListDto.setSocket(clientSocket);
@@ -80,16 +79,17 @@ public class BLPopHandler implements CommandHandler {
 
         while (true) {
             try {
-                logger.info("processWithZeroTimeout0: begin waiting block-list queue to take first conn");
+                logger.info("processWithZeroTimeout0: begin waiting block-list queue to take conn from top of the queue");
                 BlockListDto blockListDto = BLOCK_LIST_QUEUE.takeFirst();
                 Socket socket = blockListDto.getSocket();
                 String key = blockListDto.getKey();
 
                 CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
                 LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
-                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take first value with key=" + key);
+                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key);
                 String value = (String) storedList.takeFirst();
 
+                logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value);
                 ServerUtils.writeThenFlushString(socket, RESPUtils.toArray(List.of(key, value)));
 
                 if (BLOCK_LIST_QUEUE.isEmpty()) {
