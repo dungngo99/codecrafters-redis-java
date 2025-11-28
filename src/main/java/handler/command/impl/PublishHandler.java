@@ -9,8 +9,11 @@ import service.RedisLocalMap;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class PublishHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(PublishHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.PUBLISH.getAlias(), this);
@@ -25,6 +28,7 @@ public class PublishHandler implements CommandHandler {
         String channelName = (String) list.get(0);
         String message = (String) list.get(1);
 
+        logger.info("PublishHandler: publish message=" + message + "; to channelName=" + channelName);
         Map<String, SubscriberDto> channel = RedisLocalMap.CHANNEL_MAP.get(channelName);
         if (channel == null || channel.isEmpty()) {
             return RESPUtils.toSimpleInt(0);
