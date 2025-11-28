@@ -4,7 +4,9 @@ import dto.CacheDto;
 import dto.ChannelDto;
 import dto.SubscriberDto;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RedisLocalMap {
@@ -20,4 +22,6 @@ public class RedisLocalMap {
      * Map<key=subscriberId, value=Map<key=channelName, value=ChannelDto>>
      */
     public static final Map<String, Map<String, ChannelDto>> SUBSCRIBER_MAP = new ConcurrentHashMap<>();
+
+    public static final Set<String> SUBSCRIBE_MODE_SET = new HashSet<>();
 }

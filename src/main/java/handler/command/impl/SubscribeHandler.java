@@ -59,6 +59,9 @@ public class SubscribeHandler implements CommandHandler {
             channelMap.put(channelName, channelDto);
         }
 
+        // mark the connection to be in subscribed mode
+        RedisLocalMap.SUBSCRIBE_MODE_SET.add(subscriberId);
+
         List<Object> responseList = List.of(
                 CommandType.SUBSCRIBE.getAlias(),
                 channelName,

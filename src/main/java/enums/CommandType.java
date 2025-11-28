@@ -35,7 +35,13 @@ public enum CommandType {
     LLEN("llen", false),
     LPOP("lpop", true),
     BLPOP("blpop", true),
-    SUBSCRIBE("subscribe", true);
+    SUBSCRIBE("subscribe", true),
+    PSUBSSCRIBE("psubsscribe", true),
+    SSUBSCRIBE("ssubscribe", true),
+    PUNSUBSCRIBE("punsubscribe", true),
+    SUNSUBSCRIBE("sunsubscribe", true),
+    QUIT("quit", false),
+    RESET("reset", false);
 
     private final String alias;
     private final boolean isWrite;
@@ -74,6 +80,19 @@ public enum CommandType {
     public static boolean isPsync(String command) {
         return Objects.nonNull(command)
                 && command.toLowerCase().contains(PSYNC.getAlias());
+    }
+
+    public static boolean isAllowedCommandInSubscribedMode(String command) {
+        return Objects.nonNull(command)
+                && (command.toLowerCase().contains(SUBSCRIBE.getAlias())
+                || command.toLowerCase().contains(PSUBSSCRIBE.getAlias())
+                || command.toLowerCase().contains(SSUBSCRIBE.getAlias())
+                || command.toLowerCase().contains(PUNSUBSCRIBE.getAlias())
+                || command.toLowerCase().contains(SUNSUBSCRIBE.getAlias())
+                || command.toLowerCase().contains(PING.getAlias())
+                || command.toLowerCase().contains(QUIT.getAlias())
+                || command.toLowerCase().contains(RESET.getAlias())
+        );
     }
 
     public String getAlias() {

@@ -42,6 +42,13 @@ public class RESPParserUtils {
             return MultiHandler.queueCommand(clientSocket, list);
         }
 
+        // check if commands are in subscriber mode
+        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
+        Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.add(clientSocketId);
+        if (Objects.equals(Boolean.TRUE, isSubscribeMode) && !CommandType.isAllowedCommandInSubscribedMode(alias)) {
+            return RESPUtils.getErrorMessageCommandInSubscribeMode(alias);
+        }
+
         // process command
         CommandType command = CommandType.fromAlias(alias);
         List args = list.subList(1, list.size());

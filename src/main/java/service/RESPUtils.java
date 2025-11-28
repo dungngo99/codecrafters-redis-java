@@ -291,4 +291,8 @@ public class RESPUtils {
             return taskDtoList;
         }
     }
+
+    public static String getErrorMessageCommandInSubscribeMode(String command) {
+        return String.format(OutputConstants.ERROR_MESSAGE_IN_SUBSCRIBE_MOD, command);
+    }
 }
