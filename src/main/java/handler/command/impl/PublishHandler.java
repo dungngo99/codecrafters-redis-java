@@ -43,7 +43,9 @@ public class PublishHandler implements CommandHandler {
             try {
                 ServerUtils.writeThenFlushString(socket, publishedMessage);
             } catch (Exception e) {
-                logger.warning("PublishHandler: failed to publish message due to" + e.getMessage());
+                logger.warning("PublishHandler: failed to publish message due to" + e.getMessage()
+                        + " for message=" + message
+                        + "; to channelName=" + channelName);
             }
         }
 
