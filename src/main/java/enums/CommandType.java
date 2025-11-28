@@ -38,6 +38,7 @@ public enum CommandType {
     SUBSCRIBE("subscribe", true),
     PSUBSSCRIBE("psubsscribe", true),
     SSUBSCRIBE("ssubscribe", true),
+    UNSUBSCRIBE("unsubscribe", true),
     PUNSUBSCRIBE("punsubscribe", true),
     SUNSUBSCRIBE("sunsubscribe", true),
     QUIT("quit", false),
@@ -87,6 +88,7 @@ public enum CommandType {
                 && (command.toLowerCase().contains(SUBSCRIBE.getAlias())
                 || command.toLowerCase().contains(PSUBSSCRIBE.getAlias())
                 || command.toLowerCase().contains(SSUBSCRIBE.getAlias())
+                || command.toLowerCase().contains(UNSUBSCRIBE.getAlias())
                 || command.toLowerCase().contains(PUNSUBSCRIBE.getAlias())
                 || command.toLowerCase().contains(SUNSUBSCRIBE.getAlias())
                 || command.toLowerCase().contains(PING.getAlias())
