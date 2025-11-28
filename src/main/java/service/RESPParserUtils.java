@@ -42,7 +42,7 @@ public class RESPParserUtils {
             return MultiHandler.queueCommand(clientSocket, list);
         }
 
-        // check if commands are in subscriber mode
+        // check if commands are in subscribed mode
         String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
         Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.contains(clientSocketId);
         if (Objects.equals(Boolean.TRUE, isSubscribeMode) && !CommandType.isAllowedCommandInSubscribedMode(alias)) {
