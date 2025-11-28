@@ -44,7 +44,7 @@ public class RESPParserUtils {
 
         // check if commands are in subscriber mode
         String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
-        Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.add(clientSocketId);
+        Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.contains(clientSocketId);
         if (Objects.equals(Boolean.TRUE, isSubscribeMode) && !CommandType.isAllowedCommandInSubscribedMode(alias)) {
             return RESPUtils.getErrorMessageCommandInSubscribeMode(alias);
         }

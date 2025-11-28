@@ -293,6 +293,7 @@ public class RESPUtils {
     }
 
     public static String getErrorMessageCommandInSubscribeMode(String command) {
-        return String.format(OutputConstants.ERROR_MESSAGE_IN_SUBSCRIBE_MOD, command);
+        String errorMessage = String.format(OutputConstants.ERROR_MESSAGE_IN_SUBSCRIBE_MOD, command);
+        return toSimpleError(errorMessage);
     }
 }
