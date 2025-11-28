@@ -1,10 +1,12 @@
 package handler.command.impl;
 
+import constants.OutputConstants;
 import dto.SubscriberDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
+import service.ServerUtils;
 
 import java.net.Socket;
 import java.util.List;
@@ -32,6 +34,17 @@ public class PublishHandler implements CommandHandler {
         Map<String, SubscriberDto> channel = RedisLocalMap.CHANNEL_MAP.get(channelName);
         if (channel == null || channel.isEmpty()) {
             return RESPUtils.toSimpleInt(0);
+        }
+
+        for (Map.Entry<String, SubscriberDto> entry: channel.entrySet()) {
+            SubscriberDto subscriberDto = entry.getValue();
+            Socket socket = subscriberDto.getSocket();
+            String publishedMessage = RESPUtils.toArray(List.of(OutputConstants.PUBLISH_MESSAGE, channelName, message));
+            try {
+                ServerUtils.writeThenFlushString(socket, publishedMessage);
+            } catch (Exception e) {
+                logger.warning("PublishHandler: failed to publish message due to" + e.getMessage());
+            }
         }
 
         return RESPUtils.toSimpleInt(channel.size());

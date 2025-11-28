@@ -61,4 +61,5 @@ public class OutputConstants {
     public static final Integer LRANGE_EMPTY_ARRAY_LENGTH = 0;
     public static final Integer SECOND_TO_MILLISECOND = 1000;
     public static final String ERROR_MESSAGE_IN_SUBSCRIBE_MODE = "ERR Can't execute '%s': only (P|S)SUBSCRIBE / (P|S)UNSUBSCRIBE / PING / QUIT / RESET are allowed in this context";
+    public static final String PUBLISH_MESSAGE = "message";
 }
