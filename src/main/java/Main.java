@@ -183,7 +183,7 @@ public class Main {
   public static void main(String[] args) {
         // You can use print statements as follows for debugging, they'll be visible when running tests.
         // Below are only server node's operations
-        System.out.printf("Logs from your program will appear here! with %s \n", Arrays.toString(args));
+        System.out.printf("Logs from your program will appear here! with %s\n", Arrays.toString(args));
         Main main = new Main();
         main.registerNewEnvVars(args);
         main.registerCommandHandler();
