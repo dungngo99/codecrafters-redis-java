@@ -42,7 +42,8 @@ public enum CommandType {
     PUNSUBSCRIBE("punsubscribe", true),
     SUNSUBSCRIBE("sunsubscribe", true),
     QUIT("quit", false),
-    RESET("reset", false);
+    RESET("reset", false),
+    PUBLISH("publish", false);
 
     private final String alias;
     private final boolean isWrite;
