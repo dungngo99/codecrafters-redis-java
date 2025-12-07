@@ -68,6 +68,7 @@ public class Main {
         new BLPopHandler().register();
         new SubscribeHandler().register();
         new PublishHandler().register();
+        new UnsubscribeHandler().register();
     }
 
     private void registerRDB() {
