@@ -50,7 +50,8 @@ public class LPopHandler implements CommandHandler {
 
     private String processWithOptArg(BlockingDeque<?> cacheValue, int numsToRemove) {
         List<String> removedNums = new ArrayList<>();
-        for (int i=0; i<Math.min(numsToRemove, cacheValue.size()); i++) {
+        int cacheValueLength = cacheValue.size();
+        for (int i=0; i<Math.min(numsToRemove, cacheValueLength); i++) {
             removedNums.add((String) cacheValue.removeFirst());
         }
         return RESPUtils.toArray(removedNums);
