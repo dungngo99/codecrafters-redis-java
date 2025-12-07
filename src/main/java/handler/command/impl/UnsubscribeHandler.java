@@ -11,8 +11,10 @@ import service.ServerUtils;
 import java.net.Socket;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class UnsubscribeHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(UnsubscribeHandler.class.getName());
 
     @Override
     public void register() {
@@ -27,6 +29,8 @@ public class UnsubscribeHandler implements CommandHandler {
 
         String channelName = (String) list.get(0);
         String subscriberId = ServerUtils.formatIdFromSocket(clientSocket);
+
+        logger.info("UnsubscribeHandler: begin to unsubscribe from channelName=" + channelName);
 
         // update CHANNEL_MAP
         Map<String, SubscriberDto> subscriberMap = RedisLocalMap.CHANNEL_MAP.getOrDefault(channelName, null);
@@ -49,6 +53,9 @@ public class UnsubscribeHandler implements CommandHandler {
                 CommandType.UNSUBSCRIBE.getAlias(),
                 channelName,
                 subscriberMap.size());
+
+        logger.info("UnsubscribeHandler: unsubscribed from channelName=" + channelName);
+
         return RESPUtils.toBulkStringFromNestedList(responseList);
     }
 }
