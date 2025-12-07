@@ -30,7 +30,7 @@ public class PublishHandler implements CommandHandler {
         String channelName = (String) list.get(0);
         String message = (String) list.get(1);
 
-        logger.info("PublishHandler: publish message=" + message + "; to channelName=" + channelName);
+        logger.info("PublishHandler: begin to publish message=" + message + "; to channelName=" + channelName);
         Map<String, SubscriberDto> channel = RedisLocalMap.CHANNEL_MAP.get(channelName);
         if (channel == null || channel.isEmpty()) {
             return RESPUtils.toSimpleInt(0);
@@ -42,6 +42,7 @@ public class PublishHandler implements CommandHandler {
             String publishedMessage = RESPUtils.toArray(List.of(OutputConstants.PUBLISH_MESSAGE, channelName, message));
             try {
                 ServerUtils.writeThenFlushString(socket, publishedMessage);
+                logger.info("PublishHandler: published message=" + message + "; to channelName=" + channelName);
             } catch (Exception e) {
                 logger.warning("PublishHandler: failed to publish message due to" + e.getMessage()
                         + " for message=" + message
