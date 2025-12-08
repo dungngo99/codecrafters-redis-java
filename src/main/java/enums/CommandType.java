@@ -47,7 +47,8 @@ public enum CommandType {
     ZADD("zadd", true),
     ZRANK("zrank", false),
     ZRANGE("zrange", false),
-    ZCARD("zcard", false);
+    ZCARD("zcard", false),
+    ZSCORE("zscore", false);
 
     private final String alias;
     private final boolean isWrite;
