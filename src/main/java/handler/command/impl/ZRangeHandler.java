@@ -30,7 +30,7 @@ public class ZRangeHandler implements CommandHandler {
         int startIndex = Integer.parseInt((String) list.get(1));
         int endIndex = Integer.parseInt((String) list.get(2));
         if (startIndex > endIndex) {
-            return RESPUtils.getBulkNullArray();
+            return RESPUtils.getEmptyArray();
         }
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(zSetKey);
