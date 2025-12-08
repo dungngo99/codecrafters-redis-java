@@ -12,6 +12,7 @@ import service.ServerUtils;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -92,7 +93,10 @@ public class BLPopHandler implements CommandHandler {
                 String value = (String) storedList.pollFirst(1, TimeUnit.SECONDS); // wait with timeout
 
                 logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value);
-                ServerUtils.writeThenFlushString(socket, RESPUtils.toArray(List.of(key, value)));
+                List<String> resultList = new ArrayList<>();
+                resultList.add(key);
+                resultList.add(value);
+                ServerUtils.writeThenFlushString(socket, RESPUtils.toArray(resultList));
 
                 if (BLOCK_LIST_QUEUE.isEmpty()) {
                     break;
