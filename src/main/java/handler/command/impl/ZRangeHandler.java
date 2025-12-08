@@ -29,9 +29,6 @@ public class ZRangeHandler implements CommandHandler {
         String zSetKey = (String) list.get(0);
         int startIndex = Integer.parseInt((String) list.get(1));
         int endIndex = Integer.parseInt((String) list.get(2));
-        if (startIndex > endIndex) {
-            return RESPUtils.getEmptyArray();
-        }
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(zSetKey);
         if (Objects.isNull(cache)) {
@@ -42,6 +39,11 @@ public class ZRangeHandler implements CommandHandler {
         }
 
         int cardinality = zSet.getZSET_SCORE_MAP().size();
+        startIndex = startIndex < 0 ? startIndex + cardinality : startIndex;
+        endIndex = endIndex < 0 ? endIndex + cardinality : endIndex;
+        if (startIndex > endIndex) {
+            return RESPUtils.getEmptyArray();
+        }
         if (startIndex >= cardinality) {
             return RESPUtils.getEmptyArray();
         }
