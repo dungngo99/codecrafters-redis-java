@@ -15,6 +15,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -95,7 +96,7 @@ public class BLPopHandler implements CommandHandler {
                 logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value);
                 List<String> resultList = new ArrayList<>();
                 resultList.add(key);
-                resultList.add(value);
+                resultList.add(Objects.isNull(value) ? "" : value);
                 ServerUtils.writeThenFlushString(socket, RESPUtils.toArray(resultList));
 
                 if (BLOCK_LIST_QUEUE.isEmpty()) {
