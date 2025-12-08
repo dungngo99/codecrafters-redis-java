@@ -42,10 +42,15 @@ public class ZAddHandler implements CommandHandler {
             RedisLocalMap.LOCAL_MAP.put(zSetKey, cache);
         }
 
+        int zSetNewMemberCount = 0;
         ZSet zSet = (ZSet) cache.getValue();
+
+        if (!zSet.getZSET_SCORE_MAP().containsKey(zSetMember)) {
+            zSetNewMemberCount++;
+        }
         zSet.getZSET_SCORE_MAP().put(zSetMember, score);
         zSet.getZSET_SKIP_LIST().add(new ZNodeDto(zSetMember, score));
 
-        return RESPUtils.toSimpleInt(1);
+        return RESPUtils.toSimpleInt(zSetNewMemberCount);
     }
 }
