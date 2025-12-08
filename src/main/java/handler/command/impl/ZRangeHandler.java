@@ -35,7 +35,7 @@ public class ZRangeHandler implements CommandHandler {
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(zSetKey);
         if (Objects.isNull(cache)) {
-            return RESPUtils.getBulkNullArray();
+            return RESPUtils.getEmptyArray();
         }
         if (!ValueType.isZSet(cache.getValueType()) || !(cache.getValue() instanceof ZSet zSet)) {
             throw new RuntimeException("ZAddHandler: command not applied to stored value");
@@ -43,7 +43,7 @@ public class ZRangeHandler implements CommandHandler {
 
         int cardinality = zSet.getZSET_SCORE_MAP().size();
         if (startIndex >= cardinality) {
-            return RESPUtils.getBulkNullArray();
+            return RESPUtils.getEmptyArray();
         }
         endIndex = Math.min(endIndex, cardinality);
 
