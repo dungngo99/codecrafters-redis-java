@@ -28,7 +28,7 @@ public class ZCardHandler implements CommandHandler {
 
         CacheDto cache = RedisLocalMap.LOCAL_MAP.get(zSetKey);
         if (Objects.isNull(cache)) {
-            return RESPUtils.getEmptyArray();
+            return RESPUtils.toSimpleInt(0);
         }
         if (!ValueType.isZSet(cache.getValueType()) || !(cache.getValue() instanceof ZSet zSet)) {
             throw new RuntimeException("ZAddHandler: command not applied to stored value");
