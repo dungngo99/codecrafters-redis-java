@@ -1,5 +1,7 @@
 package domain;
 
+import java.util.Objects;
+
 public class ZNodeDto {
     private final String member;
     private Double score;
@@ -23,5 +25,17 @@ public class ZNodeDto {
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof ZNodeDto zNodeDto)) return false;
+        return Objects.equals(getMember(), zNodeDto.getMember()) && Objects.equals(getScore(), zNodeDto.getScore());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getMember(), getScore());
     }
 }

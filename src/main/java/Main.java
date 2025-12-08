@@ -70,6 +70,7 @@ public class Main {
         new PublishHandler().register();
         new UnsubscribeHandler().register();
         new ZAddHandler().register();
+        new ZRankHandler().register();
     }
 
     private void registerRDB() {

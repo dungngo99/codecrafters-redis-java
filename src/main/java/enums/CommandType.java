@@ -44,7 +44,8 @@ public enum CommandType {
     QUIT("quit", false),
     RESET("reset", false),
     PUBLISH("publish", false),
-    ZADD("zadd", true);
+    ZADD("zadd", true),
+    ZRANK("zrank", false);
 
     private final String alias;
     private final boolean isWrite;
