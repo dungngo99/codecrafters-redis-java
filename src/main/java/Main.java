@@ -71,6 +71,7 @@ public class Main {
         new UnsubscribeHandler().register();
         new ZAddHandler().register();
         new ZRankHandler().register();
+        new ZRangeHandler().register();
     }
 
     private void registerRDB() {
