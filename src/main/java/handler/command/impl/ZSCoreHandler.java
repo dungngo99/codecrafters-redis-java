@@ -11,8 +11,11 @@ import service.RedisLocalMap;
 import java.net.Socket;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class ZSCoreHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(ZSCoreHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.ZSCORE.getAlias(), this);
@@ -40,6 +43,7 @@ public class ZSCoreHandler implements CommandHandler {
         }
 
         Double score = zSet.getZSET_SCORE_MAP().get(zSetMember);
+        logger.info("ZSCoreHandler: score=" + score + " for zSet key=" + zSetKey + "; zSet member key=" + zSetMember);
         return RESPUtils.toBulkString(String.valueOf(score));
     }
 }
