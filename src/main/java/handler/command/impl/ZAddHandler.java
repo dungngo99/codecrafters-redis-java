@@ -29,6 +29,7 @@ public class ZAddHandler implements CommandHandler {
         Double score = Double.parseDouble(scoreStr);
         String zSetMember = (String) list.get(2);
 
+        // get/set cacheDto from RedisLocalMap
         CacheDto cache;
         if (RedisLocalMap.LOCAL_MAP.containsKey(zSetKey)) {
             cache = RedisLocalMap.LOCAL_MAP.get(zSetKey);
@@ -45,10 +46,12 @@ public class ZAddHandler implements CommandHandler {
         int zSetNewMemberCount = 0;
         ZSet zSet = (ZSet) cache.getValue();
 
+        // update zSet data structure
         if (!zSet.getZSET_SCORE_MAP().containsKey(zSetMember)) {
             zSetNewMemberCount++;
         }
         zSet.getZSET_SCORE_MAP().put(zSetMember, score);
+
         zSet.getZSET_SKIP_LIST().add(new ZNodeDto(zSetMember, score));
 
         return RESPUtils.toSimpleInt(zSetNewMemberCount);
