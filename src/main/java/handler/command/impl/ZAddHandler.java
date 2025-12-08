@@ -52,7 +52,9 @@ public class ZAddHandler implements CommandHandler {
         }
         zSet.getZSET_SCORE_MAP().put(zSetMember, score);
 
-        zSet.getZSET_SKIP_LIST().add(new ZNodeDto(zSetMember, score));
+        ZNodeDto zNodeDto = new ZNodeDto(zSetMember, score);
+        zSet.getZSET_SKIP_LIST().remove(zNodeDto); // equals() and hashCode() only depend on member, not score
+        zSet.getZSET_SKIP_LIST().add(zNodeDto);
 
         return RESPUtils.toSimpleInt(zSetNewMemberCount);
     }

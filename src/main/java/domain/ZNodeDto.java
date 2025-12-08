@@ -31,11 +31,11 @@ public class ZNodeDto {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (!(object instanceof ZNodeDto zNodeDto)) return false;
-        return Objects.equals(getMember(), zNodeDto.getMember()) && Objects.equals(getScore(), zNodeDto.getScore());
+        return Objects.equals(getMember(), zNodeDto.getMember());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMember(), getScore());
+        return Objects.hash(getMember());
     }
 }
