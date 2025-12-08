@@ -1,7 +1,7 @@
 package handler.command.impl;
 
 import constants.OutputConstants;
-import dto.SubscriberDto;
+import domain.SubscriberDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import service.RESPUtils;

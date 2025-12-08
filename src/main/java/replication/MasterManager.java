@@ -1,9 +1,9 @@
 package replication;
 
 import constants.OutputConstants;
-import dto.MasterNodeDto;
-import dto.MasterReplicaDto;
-import dto.TaskDto;
+import domain.MasterNodeDto;
+import domain.MasterReplicaDto;
+import domain.TaskDto;
 import enums.JobType;
 import handler.command.CommandHandler;
 import handler.job.impl.PropagateHandler;

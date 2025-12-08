@@ -2,9 +2,9 @@ package handler.job.impl;
 
 import constants.OutputConstants;
 import constants.ParserConstants;
-import dto.JobDto;
-import dto.RESPResultDto;
-import dto.TaskDto;
+import domain.JobDto;
+import domain.RESPResultDto;
+import domain.TaskDto;
 import enums.JobType;
 import enums.ReplCommandType;
 import handler.job.JobHandler;

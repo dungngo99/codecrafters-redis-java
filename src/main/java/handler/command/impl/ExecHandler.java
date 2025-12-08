@@ -1,9 +1,9 @@
 package handler.command.impl;
 
 import constants.OutputConstants;
-import dto.CommandDto;
-import dto.JobDto;
-import dto.ParserDto;
+import domain.CommandDto;
+import domain.JobDto;
+import domain.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import handler.job.JobHandler;

@@ -1,7 +1,7 @@
 package service;
 
-import dto.JobDto;
-import dto.ParserDto;
+import domain.JobDto;
+import domain.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import handler.command.impl.MultiHandler;

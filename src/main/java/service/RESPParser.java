@@ -1,8 +1,8 @@
 package service;
 
 import constants.OutputConstants;
-import dto.ParserDto;
-import dto.RESPResultDto;
+import domain.ParserDto;
+import domain.RESPResultDto;
 import enums.RESPResultType;
 import stream.RedisInputStream;
 

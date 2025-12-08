@@ -1,9 +1,9 @@
 package handler.job.impl;
 
 import constants.ParserConstants;
-import dto.JobDto;
-import dto.RESPResultDto;
-import dto.TaskDto;
+import domain.JobDto;
+import domain.RESPResultDto;
+import domain.TaskDto;
 import enums.JobType;
 import handler.job.JobHandler;
 import service.RESPParser;

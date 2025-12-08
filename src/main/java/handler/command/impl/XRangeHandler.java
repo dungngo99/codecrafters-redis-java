@@ -1,7 +1,7 @@
 package handler.command.impl;
 
-import dto.CacheDto;
-import dto.StreamDto;
+import domain.CacheDto;
+import domain.StreamDto;
 import enums.CommandType;
 import enums.ValueType;
 import handler.command.CommandHandler;

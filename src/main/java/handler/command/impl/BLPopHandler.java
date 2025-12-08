@@ -1,8 +1,8 @@
 package handler.command.impl;
 
 import constants.OutputConstants;
-import dto.BlockListDto;
-import dto.CacheDto;
+import domain.BlockListDto;
+import domain.CacheDto;
 import enums.CommandType;
 import enums.ValueType;
 import handler.command.CommandHandler;

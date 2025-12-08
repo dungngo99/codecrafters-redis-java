@@ -43,7 +43,8 @@ public enum CommandType {
     SUNSUBSCRIBE("sunsubscribe", true),
     QUIT("quit", false),
     RESET("reset", false),
-    PUBLISH("publish", false);
+    PUBLISH("publish", false),
+    ZADD("zadd", true);
 
     private final String alias;
     private final boolean isWrite;

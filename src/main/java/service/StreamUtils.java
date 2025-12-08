@@ -1,8 +1,8 @@
 package service;
 
 import constants.OutputConstants;
-import dto.CacheDto;
-import dto.StreamDto;
+import domain.CacheDto;
+import domain.StreamDto;
 import enums.ValueType;
 
 import java.util.ArrayList;

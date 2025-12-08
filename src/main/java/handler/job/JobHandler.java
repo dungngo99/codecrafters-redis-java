@@ -1,6 +1,6 @@
 package handler.job;
 
-import dto.JobDto;
+import domain.JobDto;
 
 import java.util.HashMap;
 import java.util.Map;

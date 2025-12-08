@@ -2,8 +2,8 @@ package service;
 
 import constants.OutputConstants;
 import constants.ParserConstants;
-import dto.RESPResultDto;
-import dto.TaskDto;
+import domain.RESPResultDto;
+import domain.TaskDto;
 import enums.CommandType;
 import enums.RESPResultType;
 

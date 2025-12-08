@@ -1,9 +1,9 @@
 package handler.job.impl;
 
-import dto.JobDto;
-import dto.MasterNodeDto;
-import dto.MasterReplicaDto;
-import dto.TaskDto;
+import domain.JobDto;
+import domain.MasterNodeDto;
+import domain.MasterReplicaDto;
+import domain.TaskDto;
 import enums.JobType;
 import enums.PropagateType;
 import handler.job.JobHandler;

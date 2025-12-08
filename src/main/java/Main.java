@@ -1,11 +1,11 @@
-import dto.JobDto;
-import dto.ServerNodeDto;
+import domain.JobDto;
+import domain.ServerNodeDto;
 import enums.JobType;
 import handler.job.impl.RespHandler;
 import replication.MasterManager;
 import replication.ReplicaClient;
 import constants.OutputConstants;
-import dto.CacheDto;
+import domain.CacheDto;
 import enums.RoleType;
 import handler.command.impl.*;
 import service.*;
@@ -69,6 +69,7 @@ public class Main {
         new SubscribeHandler().register();
         new PublishHandler().register();
         new UnsubscribeHandler().register();
+        new ZAddHandler().register();
     }
 
     private void registerRDB() {

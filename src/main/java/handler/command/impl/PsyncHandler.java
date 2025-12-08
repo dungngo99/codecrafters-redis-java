@@ -1,8 +1,8 @@
 package handler.command.impl;
 
 import constants.OutputConstants;
-import dto.JobDto;
-import dto.TaskDto;
+import domain.JobDto;
+import domain.TaskDto;
 import enums.CommandType;
 import enums.JobType;
 import enums.PropagateType;

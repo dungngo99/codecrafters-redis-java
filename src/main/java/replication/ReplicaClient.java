@@ -1,8 +1,8 @@
 package replication;
 
 import constants.OutputConstants;
-import dto.JobDto;
-import dto.MasterNodeDto;
+import domain.JobDto;
+import domain.MasterNodeDto;
 import enums.CommandType;
 import enums.JobType;
 import handler.job.impl.HandshakeHandler;

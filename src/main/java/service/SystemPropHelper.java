@@ -1,7 +1,7 @@
 package service;
 
 import constants.OutputConstants;
-import dto.MasterNodeDto;
+import domain.MasterNodeDto;
 import enums.RoleType;
 
 import java.util.Objects;

@@ -1,8 +1,8 @@
 package service;
 
-import dto.CacheDto;
-import dto.ChannelDto;
-import dto.SubscriberDto;
+import domain.CacheDto;
+import domain.ChannelDto;
+import domain.SubscriberDto;
 
 import java.util.HashSet;
 import java.util.Map;

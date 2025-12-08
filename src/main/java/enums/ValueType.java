@@ -5,9 +5,14 @@ import java.util.Objects;
 public enum ValueType {
     STRING,
     STREAM,
-    LIST;
+    LIST,
+    ZSET;
 
     public static boolean isList(ValueType inputVT) {
         return Objects.equals(inputVT, LIST);
+    }
+
+    public static boolean isZSet(ValueType inputVT) {
+        return Objects.equals(inputVT, ZSET);
     }
 }

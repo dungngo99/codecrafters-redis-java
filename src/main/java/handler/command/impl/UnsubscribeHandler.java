@@ -1,7 +1,7 @@
 package handler.command.impl;
 
-import dto.ChannelDto;
-import dto.SubscriberDto;
+import domain.ChannelDto;
+import domain.SubscriberDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import service.RESPUtils;
