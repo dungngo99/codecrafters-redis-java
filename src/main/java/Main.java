@@ -74,6 +74,7 @@ public class Main {
         new ZRangeHandler().register();
         new ZCardHandler().register();
         new ZSCoreHandler().register();
+        new ZRemHandler().register();
     }
 
     private void registerRDB() {
