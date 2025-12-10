@@ -11,8 +11,11 @@ import java.net.Socket;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.logging.Logger;
 
 public class RPushHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(RPushHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.RPUSH.getAlias(), this);
@@ -44,6 +47,8 @@ public class RPushHandler implements CommandHandler {
             cacheValue.addLast(list.get(i));
         }
 
-        return RESPUtils.toSimpleInt(cacheValue.size());
+        int cacheValueSize = cacheValue.size();
+        logger.info(String.format("RPushHandler: added new item for key=%s; cacheValueSize=%s", key, cacheValueSize));
+        return RESPUtils.toSimpleInt(cacheValueSize);
     }
 }
