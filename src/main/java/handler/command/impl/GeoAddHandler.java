@@ -9,6 +9,7 @@ import service.RESPUtils;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static constants.OutputConstants.*;
 
@@ -49,6 +50,20 @@ public class GeoAddHandler implements CommandHandler {
             geoDto.setLatitude(latitude);
             geoDto.setMember((String) list.get(i+2));
             geoDtoList.add(geoDto);
+        }
+
+        CommandHandler zAddCommandHandler = CommandHandler.HANDLER_MAP.get(CommandType.ZADD.getAlias());
+        if (Objects.isNull(zAddCommandHandler)) {
+            return RESPUtils.toSimpleInt(geoDtoList.size());
+        }
+
+        for (GeoDto geoDto: geoDtoList) {
+            double longitude = geoDto.getLongitude();
+            double latitude = geoDto.getLatitude();
+            double score = GeoUtils.calculateZSetScore(longitude, latitude);
+            String scoreStr = String.valueOf(score);
+            String member = geoDto.getMember();
+            zAddCommandHandler.process(clientSocket, List.of(geoKey, scoreStr, member));
         }
 
         return RESPUtils.toSimpleInt(geoDtoList.size());

@@ -13,4 +13,8 @@ public class GeoUtils {
     public static boolean isValidLatitude(Double latitude) {
         return LATITUDE_LOWER_BOUND <= latitude && latitude <= LATITUDE_UPPER_BOUND;
     }
+
+    public static double calculateZSetScore(Double longitude, Double latitude) {
+        return 0.0;
+    }
 }
