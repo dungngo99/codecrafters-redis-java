@@ -49,7 +49,8 @@ public enum CommandType {
     ZRANGE("zrange", false),
     ZCARD("zcard", false),
     ZSCORE("zscore", false),
-    ZREM("zrem", true);
+    ZREM("zrem", true),
+    GEOADD("geoadd", true);
 
     private final String alias;
     private final boolean isWrite;
