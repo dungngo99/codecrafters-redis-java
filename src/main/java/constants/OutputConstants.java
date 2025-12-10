@@ -62,4 +62,7 @@ public class OutputConstants {
     public static final Integer SECOND_TO_MILLISECOND = 1000;
     public static final String ERROR_MESSAGE_IN_SUBSCRIBE_MODE = "ERR Can't execute '%s': only (P|S)SUBSCRIBE / (P|S)UNSUBSCRIBE / PING / QUIT / RESET are allowed in this context";
     public static final String PUBLISH_MESSAGE = "message";
+    public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE = "ERR invalid latitude value %.000000f";
+    public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LONGITUDE = "ERR invalid longitude value %.000000f";
+    public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE_LONGITUDE = "ERR invalid latitude,longitude pair %.000000f,%.000000f";
 }

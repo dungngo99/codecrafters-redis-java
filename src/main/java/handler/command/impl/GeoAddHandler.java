@@ -3,11 +3,14 @@ package handler.command.impl;
 import domain.GeoDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
+import service.GeoUtils;
 import service.RESPUtils;
 
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import static constants.OutputConstants.*;
 
 public class GeoAddHandler implements CommandHandler {
     @Override
@@ -25,8 +28,25 @@ public class GeoAddHandler implements CommandHandler {
         List<GeoDto> geoDtoList = new ArrayList<>();
         for (int i=1; i<list.size(); i+=3) {
             GeoDto geoDto = new GeoDto();
-            geoDto.setLongitude(Double.parseDouble((String) list.get(i)));
-            geoDto.setLatitude(Double.parseDouble((String) list.get(i+1)));
+
+            double longitude = Double.parseDouble((String) list.get(i));
+            double latitude = Double.parseDouble((String) list.get(i+1));
+
+            if (!GeoUtils.isValidLongitude(longitude) && !GeoUtils.isValidLatitude(latitude)) {
+                String errorMessage = String.format(ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE_LONGITUDE, latitude, longitude);
+                return RESPUtils.toSimpleError(errorMessage);
+            }
+            if (!GeoUtils.isValidLongitude(longitude)) {
+                String errorMessage = String.format(ERROR_MESSAGE_INVALID_GEOSPATIAL_LONGITUDE, longitude);
+                return RESPUtils.toSimpleError(errorMessage);
+            }
+            if (!GeoUtils.isValidLatitude(latitude)) {
+                String errorMessage = String.format(ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE, latitude);
+                return RESPUtils.toSimpleError(errorMessage);
+            }
+
+            geoDto.setLongitude(longitude);
+            geoDto.setLatitude(latitude);
             geoDto.setMember((String) list.get(i+2));
             geoDtoList.add(geoDto);
         }
