@@ -81,7 +81,8 @@ public class BLPopHandler implements CommandHandler {
 
         while (true) {
             try {
-                logger.info("processWithZeroTimeout0: begin waiting block-list queue to take conn from top of the queue");
+                String threadName = Thread.currentThread().getName();
+                logger.info("processWithZeroTimeout0: begin waiting block-list queue to take conn from top of the queue; thread=" + threadName);
                 // BlockListDto blockListDto = BLOCK_LIST_QUEUE.takeFirst(); // wait indefinitely
                 BlockListDto blockListDto = BLOCK_LIST_QUEUE.pollFirst(1500, TimeUnit.MILLISECONDS); // wait with timeout
                 Socket socket = blockListDto.getSocket();
@@ -89,11 +90,11 @@ public class BLPopHandler implements CommandHandler {
 
                 CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
                 LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
-                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key);
+                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key + "; thread=" + threadName);
                 // String value = (String) storedList.takeFirst(); // wait indefinitely
                 String value = (String) storedList.pollFirst(1500, TimeUnit.MILLISECONDS); // wait with timeout
 
-                logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value);
+                logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value + "; thread=" + threadName);
                 List<String> resultList = new ArrayList<>();
                 resultList.add(key);
                 resultList.add(Objects.isNull(value) ? "" : value);
