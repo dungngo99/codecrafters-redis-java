@@ -90,7 +90,7 @@ public class BLPopHandler implements CommandHandler {
 
                 CacheDto cache = RedisLocalMap.LOCAL_MAP.get(key);
                 LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
-                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key + "; thread=" + threadName);
+                logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key + "; size=" + storedList.size() + "; thread=" + threadName);
                 // String value = (String) storedList.takeFirst(); // wait indefinitely
                 String value = (String) storedList.pollFirst(1500, TimeUnit.MILLISECONDS); // wait with timeout
 
