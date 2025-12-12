@@ -15,8 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class GeoPosHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(GeoPosHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.GEOPOS.getAlias(), this);
@@ -52,8 +55,8 @@ public class GeoPosHandler implements CommandHandler {
                             .build()
                             .process();
 
-                    String zScoreStr = result.getList().get(0);
-                    long geoZScore = (long) Double.parseDouble(zScoreStr);
+                    String geoZScoreStr = result.getList().get(0);
+                    long geoZScore = (long) Double.parseDouble(geoZScoreStr);
                     GeoDto geoDto = GeoUtils.decodeZSetScore(geoZScore);
                     String latitude = String.valueOf(geoDto.getLatitude());
                     String longitude = String.valueOf(geoDto.getLongitude());
@@ -64,6 +67,7 @@ public class GeoPosHandler implements CommandHandler {
             }
         }
 
+        logger.info("GeoPosHandler: decoded ZScore to Geo Coordinates=" + respList);
         return RESPUtils.toBulkStringFromNestedList(respList);
     }
 }
