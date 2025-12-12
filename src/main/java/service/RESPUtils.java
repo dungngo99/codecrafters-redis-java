@@ -70,21 +70,15 @@ public class RESPUtils {
     }
 
     public static String toBulkStringFromNestedList(List<Object> list) {
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return getBulkNullArray();
-        }
-        if (list.isEmpty()) {
-            return getEmptyArray();
         }
         return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
     }
 
     private static String toBulkStringFromNestedList0(List<Object> list) {
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return getBulkNullArray();
-        }
-        if (list.isEmpty()) {
-            return getEmptyArray();
         }
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + list.size());
