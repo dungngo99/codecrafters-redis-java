@@ -1,5 +1,7 @@
 package service;
 
+import domain.GeoDto;
+
 public class GeoUtils {
     public static final Double LONGITUDE_LOWER_BOUND = -180.0;
     public static final Double LONGITUDE_UPPER_BOUND = 180.0;
@@ -50,5 +52,44 @@ public class GeoUtils {
         long ySpread = spreadInt32ToInt64(y);
         long yShifted = ySpread << 1;
         return xSpread | yShifted;
+    }
+
+    public static GeoDto decodeZSetScore(long geoCode) {
+        // align bits of both latitude and longitude to take even-numbered position
+        long y = geoCode >> 1;
+        long x = geoCode;
+
+        // compact bits back to 32-bit ints
+        int gridLatitudeInt = compactInt64ToInt32(x);
+        int gridLongitudeInt = compactInt64ToInt32(y);
+
+        return convertGridNumbersToGeoDto(gridLatitudeInt, gridLongitudeInt);
+    }
+
+    private static int compactInt64ToInt32(long v) {
+        v = v & 0x5555555555555555L;
+        v = (v | (v >> 1)) & 0x3333333333333333L;
+        v = (v | (v >> 2)) & 0x0F0F0F0F0F0F0F0FL;
+        v = (v | (v >> 4)) & 0x00FF00FF00FF00FFL;
+        v = (v | (v >> 8)) & 0x0000FFFF0000FFFFL;
+        v = (v | (v >> 16)) & 0x00000000FFFFFFFFL;
+        return (int) v;
+    }
+
+    private static GeoDto convertGridNumbersToGeoDto(int gridLatitude, int gridLongitude) {
+        // Calculate the grid boundaries
+        double gridLatitudeMin = LATITUDE_LOWER_BOUND + LATITUDE_RANGE * (gridLatitude / Math.pow(2, 26));
+        double gridLatitudeMax = LATITUDE_LOWER_BOUND + LATITUDE_RANGE * ((gridLatitude + 1) / Math.pow(2, 26));
+        double gridLongitudeMin = LONGITUDE_LOWER_BOUND + LONGITUDE_RANGE * (gridLongitude / Math.pow(2, 26));
+        double gridLongitudeMax = LONGITUDE_LOWER_BOUND + LONGITUDE_RANGE * ((gridLongitude + 1) / Math.pow(2, 26));
+
+        // Calculate the center point of the grid cell
+        double latitude = (gridLatitudeMin + gridLatitudeMax) / 2;
+        double longitude = (gridLongitudeMin + gridLongitudeMax) / 2;
+
+        GeoDto geoDto = new GeoDto();
+        geoDto.setLatitude(latitude);
+        geoDto.setLongitude(longitude);
+        return geoDto;
     }
 }

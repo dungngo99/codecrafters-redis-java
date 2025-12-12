@@ -6,6 +6,7 @@ import domain.RESPResultDto;
 import enums.RESPResultType;
 import stream.RedisInputStream;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,7 @@ public class RESPParser {
     public static class Builder {
         private Socket clientSocket;
         private Integer bufferSize;
+        private ByteArrayInputStream byteArrayInputStream;
 
         public Builder addClientSocket(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -34,10 +36,23 @@ public class RESPParser {
             return this;
         }
 
+        public Builder addByteArrayInputStream(ByteArrayInputStream byteArrayInputStream) {
+            this.byteArrayInputStream = byteArrayInputStream;
+            return this;
+        }
+
         public RESPParser build() throws IOException {
             RESPParser parser = new RESPParser();
             parser.setClientSocket(this.clientSocket);
-            parser.setInputStream(new RedisInputStream(this.clientSocket.getInputStream(), this.bufferSize));
+            if (this.clientSocket != null && this.byteArrayInputStream != null) {
+                throw new RuntimeException("cannot process both socket stream and in-memory input stream");
+            }
+            if (this.clientSocket != null) {
+                parser.setInputStream(new RedisInputStream(this.clientSocket.getInputStream(), this.bufferSize));
+            }
+            if (this.byteArrayInputStream != null) {
+                parser.setInputStream(new RedisInputStream(this.byteArrayInputStream, this.bufferSize));
+            }
             return parser;
         }
     }

@@ -1,10 +1,17 @@
 package handler.command.impl;
 
+import constants.ParserConstants;
+import domain.GeoDto;
+import domain.RESPResultDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
+import service.GeoUtils;
+import service.RESPParser;
 import service.RESPUtils;
 
+import java.io.ByteArrayInputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,12 +45,25 @@ public class GeoPosHandler implements CommandHandler {
             if (resp == null || resp.isEmpty() || resp.equals(RESPUtils.getBulkNullString())) {
                 respList.add(null);
             } else {
-                respList.add(List.of("0", "0"));
+                try {
+                    RESPResultDto result = new RESPParser.Builder()
+                            .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
+                            .addByteArrayInputStream(new ByteArrayInputStream(resp.getBytes(StandardCharsets.UTF_8)))
+                            .build()
+                            .process();
+
+                    String zScoreStr = result.getList().get(0);
+                    long geoZScore = (long) Double.parseDouble(zScoreStr);
+                    GeoDto geoDto = GeoUtils.decodeZSetScore(geoZScore);
+                    String latitude = String.valueOf(geoDto.getLatitude());
+                    String longitude = String.valueOf(geoDto.getLongitude());
+                    respList.add(List.of(longitude, latitude)); // lon then lat
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getCause());
+                }
             }
         }
 
-        String r1 = RESPUtils.toBulkStringFromNestedList(respList);
-        System.out.println(r1);
-        return r1;
+        return RESPUtils.toBulkStringFromNestedList(respList);
     }
 }
