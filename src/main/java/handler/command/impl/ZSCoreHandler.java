@@ -35,7 +35,7 @@ public class ZSCoreHandler implements CommandHandler {
             return RESPUtils.getBulkNullString();
         }
         if (!ValueType.isZSet(cache.getValueType()) || !(cache.getValue() instanceof ZSet zSet)) {
-            throw new RuntimeException("ZAddHandler: command not applied to stored value");
+            throw new RuntimeException("ZSCoreHandler: command not applied to stored value");
         }
 
         if (!zSet.getZSET_SCORE_MAP().containsKey(zSetMember)) {

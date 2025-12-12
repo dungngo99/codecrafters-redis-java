@@ -70,15 +70,26 @@ public class RESPUtils {
     }
 
     public static String toBulkStringFromNestedList(List<Object> list) {
-        if (list == null || list.isEmpty()) {
+        if (list == null) {
             return getBulkNullArray();
+        }
+        if (list.isEmpty()) {
+            return getEmptyArray();
         }
         return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
     }
 
     private static String toBulkStringFromNestedList0(List<Object> list) {
+        if (list == null) {
+            return getBulkNullArray();
+        }
+        if (list.isEmpty()) {
+            return getEmptyArray();
+        }
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + list.size());
+        int i = 0;
+        int size = list.size();
         for (Object obj: list) {
             if (obj instanceof String) {
                 String str = (String) obj;
@@ -88,6 +99,12 @@ public class RESPUtils {
                 joiner.add(toBulkStringFromNestedList0((List<Object>) obj));
             } else if (obj instanceof Integer) {
                 joiner.add(OutputConstants.COLON_DELIMITER + obj);
+            } else if (obj == null) {
+                if (i < size-1) {
+                    joiner.add(OutputConstants.ASTERISK + OutputConstants.NULL_BULK);
+                } else {
+                    joiner.add(toBulkStringFromNestedList0(null));
+                }
             }
         }
         return joiner.toString();

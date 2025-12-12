@@ -76,6 +76,7 @@ public class Main {
         new ZSCoreHandler().register();
         new ZRemHandler().register();
         new GeoAddHandler().register();
+        new GeoPosHandler().register();
     }
 
     private void registerRDB() {

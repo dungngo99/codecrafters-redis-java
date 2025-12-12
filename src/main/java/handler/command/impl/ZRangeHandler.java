@@ -35,7 +35,7 @@ public class ZRangeHandler implements CommandHandler {
             return RESPUtils.getEmptyArray();
         }
         if (!ValueType.isZSet(cache.getValueType()) || !(cache.getValue() instanceof ZSet zSet)) {
-            throw new RuntimeException("ZAddHandler: command not applied to stored value");
+            throw new RuntimeException("ZRangeHandler: command not applied to stored value");
         }
 
         int cardinality = zSet.getZSET_SCORE_MAP().size();
