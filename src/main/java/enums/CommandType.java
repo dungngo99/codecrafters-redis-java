@@ -52,7 +52,8 @@ public enum CommandType {
     ZREM("zrem", true),
     GEOADD("geoadd", true),
     GEOPOS("geopos", false),
-    GEODIST("geodist", false);
+    GEODIST("geodist", false),
+    GEOSEARCH("geosearch", false);
 
     private final String alias;
     private final boolean isWrite;

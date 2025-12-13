@@ -35,8 +35,8 @@ public class GeoDistHandler implements CommandHandler {
             throw new RuntimeException("GeoDistHandler: cmd GEOPOS not found");
         }
 
-        String resp = geoPosCommandHandler.process(clientSocket, list);
         try {
+            String resp = geoPosCommandHandler.process(clientSocket, list);
             RESPResultDto result = new RESPParser.Builder()
                     .addBufferSize(ParserConstants.RESP_PARSER_BUFFER_SIZE)
                     .addByteArrayInputStream(new ByteArrayInputStream(resp.getBytes(StandardCharsets.UTF_8)))
