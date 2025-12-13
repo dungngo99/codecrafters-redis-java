@@ -48,7 +48,7 @@ public class GeoDistHandler implements CommandHandler {
             double longitude2 = Double.parseDouble(geoCoordinates[2]);
             double latitude2 = Double.parseDouble(geoCoordinates[3]);
             Double distance = GeoUtils.haversine(latitude1, longitude1, latitude2, longitude2);
-            return RESPUtils.toSimpleString(String.format("%.4f", distance));
+            return RESPUtils.toBulkString(String.format("%.4f", distance));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
