@@ -14,8 +14,11 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class GeoDistHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(GeoDistHandler.class.getName());
+
     @Override
     public void register() {
         CommandHandler.HANDLER_MAP.put(CommandType.GEODIST.getAlias(), this);
@@ -48,6 +51,7 @@ public class GeoDistHandler implements CommandHandler {
             double longitude2 = Double.parseDouble(geoCoordinates[2]);
             double latitude2 = Double.parseDouble(geoCoordinates[3]);
             Double distance = GeoUtils.haversine(latitude1, longitude1, latitude2, longitude2);
+            logger.info("GeoDistHandler: input list=" + list + " has distance of " + distance + "m");
             return RESPUtils.toBulkString(String.format("%.4f", distance));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
