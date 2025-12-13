@@ -22,6 +22,7 @@ public class OutputConstants {
     public static final String REDIS_SERVER_ROLE_TYPE = "role";
     public static final String COLON_DELIMITER = ":";
     public static final String DASH_DELIMITER = "-";
+    public static final String COMMA_DELIMITER = ",";
     public static final String REDIS_SERVER_REPLICA_OF = "replicaof";
     public static final int MASTER_REPLID_LENGTH = 40;
     public static final String MASTER_REPLID = "master_replid";

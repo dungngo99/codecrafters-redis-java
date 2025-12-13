@@ -1,5 +1,6 @@
 package service;
 
+import constants.OutputConstants;
 import domain.JobDto;
 import domain.ParserDto;
 import enums.CommandType;
@@ -24,9 +25,14 @@ public class RESPParserUtils {
         Socket clientSocket = parserDto.getSocket();
 
         // pre-check
-        if (list.isEmpty() || clientSocket == null) {
+        if (list.isEmpty()) {
             return "";
         }
+
+        if (Objects.equals(parserDto.getNoProcessCommandHandler(), Boolean.TRUE)) {
+            return String.join(OutputConstants.COMMA_DELIMITER, list);
+        }
+
         String alias = list.get(0);
         CommandHandler commandHandler = CommandHandler.HANDLER_MAP.getOrDefault(alias.toLowerCase(), null);
         if (commandHandler == null) {

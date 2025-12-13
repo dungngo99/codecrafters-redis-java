@@ -9,6 +9,7 @@ public class GeoUtils {
     public static final Double LATITUDE_UPPER_BOUND = 85.05112878;
     private static final Double LATITUDE_RANGE = LATITUDE_UPPER_BOUND - LATITUDE_LOWER_BOUND;
     private static final Double LONGITUDE_RANGE = LONGITUDE_UPPER_BOUND - LONGITUDE_LOWER_BOUND;
+    private static final Double R = 6372797.560856; // in meters
 
     public static boolean isValidLongitude(Double longitude) {
         return LONGITUDE_LOWER_BOUND <= longitude && longitude <= LONGITUDE_UPPER_BOUND;
@@ -91,5 +92,15 @@ public class GeoUtils {
         geoDto.setLatitude(latitude);
         geoDto.setLongitude(longitude);
         return geoDto;
+    }
+
+    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+        double dLat = lat2 - lat1;
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.pow(Math.sin(dLat/2), 2) + Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        return R * c;
     }
 }

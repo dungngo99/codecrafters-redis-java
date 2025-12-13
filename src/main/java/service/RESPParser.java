@@ -25,6 +25,7 @@ public class RESPParser {
         private Socket clientSocket;
         private Integer bufferSize;
         private ByteArrayInputStream byteArrayInputStream;
+        private Boolean isNoProcessCommandHandler;
 
         public Builder addClientSocket(Socket clientSocket) {
             this.clientSocket = clientSocket;
@@ -41,6 +42,11 @@ public class RESPParser {
             return this;
         }
 
+        public Builder isNoProcessCommandHandler(Boolean isNoProcessCommandHandler) {
+            this.isNoProcessCommandHandler = isNoProcessCommandHandler;
+            return this;
+        }
+
         public RESPParser build() throws IOException {
             RESPParser parser = new RESPParser();
             parser.setClientSocket(this.clientSocket);
@@ -52,6 +58,9 @@ public class RESPParser {
             }
             if (this.byteArrayInputStream != null) {
                 parser.setInputStream(new RedisInputStream(this.byteArrayInputStream, this.bufferSize));
+            }
+            if (this.isNoProcessCommandHandler != null) {
+                parser.setNoProcessCommandHandler(this.isNoProcessCommandHandler);
             }
             return parser;
         }
@@ -122,7 +131,7 @@ public class RESPParser {
         for (int i=0; i<size; i++) {
             ans.add(processThenConvert());
         }
-        return new ParserDto<>(this.clientSocket, ans);
+        return new ParserDto<>(this.clientSocket, ans, this.isNoProcessCommandHandler);
     }
 
     private ParserDto<String> processNextString() throws IOException {
@@ -163,6 +172,7 @@ public class RESPParser {
 
     private Socket clientSocket;
     private RedisInputStream inputStream;
+    private Boolean isNoProcessCommandHandler;
 
     public Socket getClientSocket() {
         return clientSocket;
@@ -178,5 +188,13 @@ public class RESPParser {
 
     public void setInputStream(RedisInputStream inputStream) {
         this.inputStream = inputStream;
+    }
+
+    public Boolean getNoProcessCommandHandler() {
+        return isNoProcessCommandHandler;
+    }
+
+    public void setNoProcessCommandHandler(Boolean noProcessCommandHandler) {
+        isNoProcessCommandHandler = noProcessCommandHandler;
     }
 }
