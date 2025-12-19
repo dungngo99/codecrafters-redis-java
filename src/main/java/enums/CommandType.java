@@ -53,7 +53,8 @@ public enum CommandType {
     GEOADD("geoadd", true),
     GEOPOS("geopos", false),
     GEODIST("geodist", false),
-    GEOSEARCH("geosearch", false);
+    GEOSEARCH("geosearch", false),
+    ACL("acl", false);
 
     private final String alias;
     private final boolean isWrite;

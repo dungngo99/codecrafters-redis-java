@@ -79,6 +79,7 @@ public class Main {
         new GeoPosHandler().register();
         new GeoDistHandler().register();
         new GeoSearchHandler().register();
+        new AclHandler().register();
     }
 
     private void registerRDB() {
