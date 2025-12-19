@@ -16,8 +16,10 @@ import java.net.Socket;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
     private final ServerNodeDto serverNode;
 
     public Main() {
@@ -41,6 +43,7 @@ public class Main {
     }
 
     private void registerCommandHandler() {
+        logger.info("Main: registering command handlers");
         new EchoHandler().register();
         new PingHandler().register();
         new SetHandler().register();
