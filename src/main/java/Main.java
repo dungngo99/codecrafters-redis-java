@@ -31,6 +31,7 @@ public class Main {
     }
 
     private void registerNewEnvVars(String[] args) {
+        logger.info("Main: registering new env vars=" + Arrays.toString(args));
         int length = args.length;
         for(int i=0; i<length; i+=2) {
             if (i+1>=length) {
@@ -86,6 +87,7 @@ public class Main {
     }
 
     private void registerRDB() {
+        logger.info("Main: registering RDB");
         RDBLoaderUtils.load();
     }
 
