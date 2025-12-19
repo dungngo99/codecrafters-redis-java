@@ -77,8 +77,11 @@ public class RESPUtils {
     }
 
     private static String toBulkStringFromNestedList0(List<Object> list) {
-        if (list == null || list.isEmpty()) {
+        if (list == null) {
             return getBulkNullArray();
+        }
+        if (list.isEmpty()) {
+            return getEmptyArray();
         }
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + list.size());
