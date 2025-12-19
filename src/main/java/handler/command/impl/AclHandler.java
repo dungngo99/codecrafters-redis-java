@@ -16,6 +16,7 @@ public class AclHandler implements CommandHandler {
     private static final String WHOAMI_DEFAULT_UNAUTHENTICATED_USER = "default";
     private static final String GET_USER_FLAGS = "flags";
     private static final String NO_PASS_FLAG = "nopass";
+    private static final String GET_USER_PASSWORDS = "passwords";
 
     @Override
     public void register() {
@@ -52,6 +53,8 @@ public class AclHandler implements CommandHandler {
         if (WHOAMI_DEFAULT_UNAUTHENTICATED_USER.equalsIgnoreCase(userName)) {
             respObjList.add(GET_USER_FLAGS);
             respObjList.add(new ArrayList<>(List.of(NO_PASS_FLAG)));
+            respObjList.add(GET_USER_PASSWORDS);
+            respObjList.add(new ArrayList<>());
             return RESPUtils.toBulkStringFromNestedList(respObjList);
         }
         return RESPUtils.getEmptyArray();
