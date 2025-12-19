@@ -1,15 +1,19 @@
 package handler.command.impl;
 
+import domain.BlockListDto;
 import domain.CacheDto;
 import enums.CommandType;
 import enums.ValueType;
 import handler.command.CommandHandler;
 import service.RESPUtils;
 import service.RedisLocalMap;
+import service.ServerUtils;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.Logger;
 
@@ -49,6 +53,33 @@ public class RPushHandler implements CommandHandler {
 
         int cacheValueSize = cacheValue.size();
         logger.info(String.format("RPushHandler: added new item for key=%s; cacheValueSize=%s", key, cacheValueSize));
+
+        if (!RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.isEmpty()) {
+            try {
+                BlockListDto blockListDto = null;
+                int blpopClientBlockQueueSize = RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.size();
+                int index = 0;
+                while (index < blpopClientBlockQueueSize) {
+                    BlockListDto blockListDtoFromQueue = RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.takeFirst();
+                    String blpopKey = blockListDtoFromQueue.getKey();
+                    if (Objects.equals(blpopKey, key)) {
+                        blockListDto = blockListDtoFromQueue;
+                        break;
+                    }
+                    RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.addLast(blockListDtoFromQueue);
+                    index++;
+                }
+                if (Objects.nonNull(blockListDto)) {
+                    Socket blpopClientSocket = blockListDto.getSocket();
+                    String value = (String) cacheValue.takeFirst();
+                    List<String> resultList = new ArrayList<>(List.of(key, value));
+                    ServerUtils.writeThenFlushString(blpopClientSocket, RESPUtils.toArray(resultList));
+                }
+            } catch (Exception e) {
+                logger.warning("RPushHandler: failed to write key=");
+            }
+        }
+
         return RESPUtils.toSimpleInt(cacheValueSize);
     }
 }
