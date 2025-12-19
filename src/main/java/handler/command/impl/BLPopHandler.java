@@ -92,7 +92,7 @@ public class BLPopHandler implements CommandHandler {
                 LinkedBlockingDeque<Object> storedList = (LinkedBlockingDeque<Object>) cache.getValue();
                 logger.info("processWithZeroTimeout0: begin waiting cached linked-block queue to take from top of the queue, value with key=" + key + "; size=" + storedList.size() + "; thread=" + threadName);
                 // String value = (String) storedList.takeFirst(); // wait indefinitely
-                String value = (String) storedList.pollFirst(1500, TimeUnit.MILLISECONDS); // wait with timeout
+                String value = (String) storedList.pollFirst(1900, TimeUnit.MILLISECONDS); // wait with timeout
 
                 logger.info("processWithZeroTimeout0: get value from linked-block queue with key=" + key + "; value=" + value + "; thread=" + threadName);
                 List<String> resultList = new ArrayList<>();
