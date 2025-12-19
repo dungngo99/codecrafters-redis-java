@@ -81,7 +81,7 @@ public class RESPUtils {
             return getBulkNullArray();
         }
         if (list.isEmpty()) {
-            return getEmptyArray();
+            return getEmptyArrayWithoutEndingCRLF();
         }
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF);
         joiner.add(OutputConstants.ASTERISK + list.size());
@@ -133,6 +133,12 @@ public class RESPUtils {
 
     public static String getEmptyArray() {
         StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.CRLF);
+        joiner.add(OutputConstants.ASTERISK + OutputConstants.LRANGE_EMPTY_ARRAY_LENGTH);
+        return joiner.toString();
+    }
+
+    public static String getEmptyArrayWithoutEndingCRLF() {
+        StringJoiner joiner = new StringJoiner(OutputConstants.CRLF, OutputConstants.EMPTY, OutputConstants.EMPTY);
         joiner.add(OutputConstants.ASTERISK + OutputConstants.LRANGE_EMPTY_ARRAY_LENGTH);
         return joiner.toString();
     }

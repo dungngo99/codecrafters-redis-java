@@ -35,7 +35,7 @@ public class AclHandler implements CommandHandler {
             if (list.size() < 2) {
                 throw new RuntimeException("invalid param");
             }
-            String userName = (String) list.get(1);
+            String userName = ((String) list.get(1)).toLowerCase();
             logger.info("AclHandler: processing GETUSER sub-cmd with userName=" + userName);
             return handleGetUserSubcommand(userName);
         }
