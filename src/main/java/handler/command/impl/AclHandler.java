@@ -6,8 +6,10 @@ import service.RESPUtils;
 
 import java.net.Socket;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class AclHandler implements CommandHandler {
+    private static final Logger logger = Logger.getLogger(AclHandler.class.getName());
     private static final String WHOAMI_SUBCOMMAND = "whoami";
     private static final String WHOAMI_DEFAULT_UNAUTHENTICATED_USER = "default";
 
@@ -23,6 +25,7 @@ public class AclHandler implements CommandHandler {
         }
         String subcommand = (String) list.get(0);
         if (WHOAMI_SUBCOMMAND.compareToIgnoreCase(subcommand) == 0) {
+            logger.info("AclHandler: processing cmd");
             return handleWhoAmISubcommand();
         }
         throw new RuntimeException("this sub-command has not been implemented yet");
