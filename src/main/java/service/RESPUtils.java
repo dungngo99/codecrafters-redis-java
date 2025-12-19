@@ -70,11 +70,8 @@ public class RESPUtils {
     }
 
     public static String toBulkStringFromNestedList(List<Object> list) {
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return getBulkNullArray();
-        }
-        if (list.isEmpty()) {
-            return getEmptyArray();
         }
         return toBulkStringFromNestedList0(list) + OutputConstants.CRLF;
     }
