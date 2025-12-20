@@ -6,6 +6,7 @@ import handler.command.CommandHandler;
 import service.HashUtils;
 import service.RESPUtils;
 import service.RedisLocalMap;
+import service.StringUtils;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -73,7 +74,11 @@ public class AclHandler implements CommandHandler {
         AclConfigDto aclConfigDto = (AclConfigDto) RedisLocalMap.ACL_MAP.get(userName);
         if (WHOAMI_USER_NAME_DEFAULT.equalsIgnoreCase(userName)) {
             respObjList.add(FLAGS_KEY);
-            respObjList.add(new ArrayList<>(List.of(NO_PASS_FLAGS_VALUE)));
+            if (Objects.nonNull(aclConfigDto) && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())) {
+                respObjList.add(new ArrayList<>());
+            } else {
+                respObjList.add(new ArrayList<>(List.of(NO_PASS_FLAGS_VALUE)));
+            }
             respObjList.add(PASSWORDS_KEY);
             if (Objects.nonNull(aclConfigDto)) {
                 List<String> passwordValues = new ArrayList<>(List.of(aclConfigDto.getPasswordHash()));
