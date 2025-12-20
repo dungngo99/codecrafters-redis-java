@@ -28,4 +28,6 @@ public class RedisLocalMap {
     public static final Map<String, Map<String, ChannelDto>> SUBSCRIBER_MAP = new ConcurrentHashMap<>();
 
     public static final Set<String> SUBSCRIBE_MODE_SET = new HashSet<>();
+
+    public static final Map<String, Object> ACL_MAP = new ConcurrentHashMap<>();
 }
