@@ -84,6 +84,7 @@ public class Main {
         new GeoDistHandler().register();
         new GeoSearchHandler().register();
         new AclHandler().register();
+        new AuthHandler().register();
     }
 
     private void registerRDB() {

@@ -54,7 +54,8 @@ public enum CommandType {
     GEOPOS("geopos", false),
     GEODIST("geodist", false),
     GEOSEARCH("geosearch", false),
-    ACL("acl", false);
+    ACL("acl", false),
+    AUTH("auth", false);
 
     private final String alias;
     private final boolean isWrite;
