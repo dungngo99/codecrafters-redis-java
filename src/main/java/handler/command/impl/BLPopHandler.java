@@ -74,6 +74,7 @@ public class BLPopHandler implements CommandHandler {
             blockListDto.setSocket(clientSocket);
             blockListDto.setKey(key);
             RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.addLast(blockListDto);
+            logger.info("processWithZeroTimeout: BLPOP client block queue size=" + RedisLocalMap.BLPOP_CLIENT_BLOCK_QUEUE.size());
             return OutputConstants.EMPTY;
         }
     }

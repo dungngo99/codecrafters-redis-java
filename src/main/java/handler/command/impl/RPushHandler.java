@@ -76,7 +76,7 @@ public class RPushHandler implements CommandHandler {
                     ServerUtils.writeThenFlushString(blpopClientSocket, RESPUtils.toArray(resultList));
                 }
             } catch (Exception e) {
-                logger.warning("RPushHandler: failed to write key=");
+                logger.warning("RPushHandler: failed to write cacheValue for key=" + key);
             }
         }
 
