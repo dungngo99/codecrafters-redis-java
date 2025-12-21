@@ -3,10 +3,7 @@ package handler.command.impl;
 import domain.AclConfigDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
-import service.HashUtils;
-import service.RESPUtils;
-import service.RedisLocalMap;
-import service.StringUtils;
+import service.*;
 
 import java.net.Socket;
 import java.util.ArrayList;
@@ -14,21 +11,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import static constants.OutputConstants.*;
+
 public class AclHandler implements CommandHandler {
     private static final Logger logger = Logger.getLogger(AclHandler.class.getName());
-    /** SUBCOMMANDS */
-    private static final String WHOAMI_SUBCOMMAND = "whoami";
-    private static final String GET_USER_SUBCOMMAND = "getuser";
-    private static final String SET_USER_SUBCOMMAND = "setuser";
-    /** USER NAMES */
-    private static final String WHOAMI_USER_NAME_DEFAULT = "default";
-    /** ACL CONFIGURATION KEYS */
-    private static final String FLAGS_KEY = "flags";
-    private static final String PASSWORDS_KEY = "passwords";
-    /** ACL CONFIGURATION VALUES */
-    private static final String NO_PASS_FLAGS_VALUE = "nopass";
-    /** ACL RULES */
-    private static final String PASSWORDS_RULE = ">";
+
+    public static boolean isAclSetUserPassword(List<String> args) {
+        return args.size() == 4 &&
+                CommandType.ACL.getAlias().equalsIgnoreCase(args.get(0))
+                && SET_USER_SUBCOMMAND.equalsIgnoreCase(args.get(1))
+                && WHOAMI_USER_NAME_DEFAULT.equalsIgnoreCase(args.get(2))
+                && args.get(3).startsWith(PASSWORDS_RULE);
+    }
 
     @Override
     public void register() {
@@ -59,8 +53,9 @@ public class AclHandler implements CommandHandler {
             }
             String userName = ((String) list.get(1)).toLowerCase();
             String configurationValue = (String) list.get(2);
+            String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
             logger.info("AclHandler: processing SETUSER sub-cmd with userName=" + userName);
-            return handleSetUserSubcommand(userName, configurationValue);
+            return handleSetUserSubcommand(userName, configurationValue, clientSocketId);
         }
         throw new RuntimeException("this sub-command has not been implemented yet");
     }
@@ -91,11 +86,12 @@ public class AclHandler implements CommandHandler {
         return RESPUtils.getEmptyArray();
     }
 
-    private String handleSetUserSubcommand(String userName, String configurationValue) {
+    private String handleSetUserSubcommand(String userName, String configurationValue, String clientSocketId) {
         if (configurationValue.startsWith(PASSWORDS_RULE)) {
             String password = configurationValue.substring(1);
             AclConfigDto configurationDto = (AclConfigDto) RedisLocalMap.ACL_MAP.computeIfAbsent(userName, (k) -> new AclConfigDto());
             configurationDto.setPasswordHash(HashUtils.convertToSHA256(password));
+            RedisLocalMap.AUTHENTICATED_CONNECTION_SET.add(clientSocketId);
         }
         return RESPUtils.getRESPOk();
     }

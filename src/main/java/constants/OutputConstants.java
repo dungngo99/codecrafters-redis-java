@@ -66,4 +66,18 @@ public class OutputConstants {
     public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE = "ERR invalid latitude value %.000000f";
     public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LONGITUDE = "ERR invalid longitude value %.000000f";
     public static final String ERROR_MESSAGE_INVALID_GEOSPATIAL_LATITUDE_LONGITUDE = "ERR invalid latitude,longitude pair %.000000f,%.000000f";
+    /** ACL SUBCOMMANDS */
+    public static final String WHOAMI_SUBCOMMAND = "whoami";
+    public static final String GET_USER_SUBCOMMAND = "getuser";
+    public static final String SET_USER_SUBCOMMAND = "setuser";
+    /** ACL USER NAMES */
+    public static final String WHOAMI_USER_NAME_DEFAULT = "default";
+    /** ACL CONFIGURATION KEYS */
+    public static final String FLAGS_KEY = "flags";
+    public static final String PASSWORDS_KEY = "passwords";
+    /** ACL CONFIGURATION VALUES */
+    public static final String NO_PASS_FLAGS_VALUE = "nopass";
+    /** ACL RULES */
+    public static final String PASSWORDS_RULE = ">";
+    public static final String ERROR_MESSAGE_NOAUTH_AUTHENTICATION = "NOAUTH Authentication required.";
 }

@@ -1,10 +1,12 @@
 package service;
 
 import constants.OutputConstants;
+import domain.AclConfigDto;
 import domain.JobDto;
 import domain.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
+import handler.command.impl.AclHandler;
 import handler.command.impl.MultiHandler;
 import handler.job.JobHandler;
 import replication.MasterManager;
@@ -23,6 +25,16 @@ public class RESPParserUtils {
         // init
         List<String> list = parserDto.getValue();
         Socket clientSocket = parserDto.getSocket();
+        String userName = parserDto.getUserName();
+
+        AclConfigDto aclConfigDto = (AclConfigDto) RedisLocalMap.ACL_MAP.get(userName);
+        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
+        if (Objects.nonNull(aclConfigDto)
+                && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())
+                && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(clientSocketId)
+                && !AclHandler.isAclSetUserPassword(list)) {
+            return RESPUtils.toSimpleError(OutputConstants.ERROR_MESSAGE_NOAUTH_AUTHENTICATION);
+        }
 
         // pre-check
         if (list.isEmpty()) {
@@ -49,7 +61,6 @@ public class RESPParserUtils {
         }
 
         // check if commands are in subscribed mode
-        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
         Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.contains(clientSocketId);
         if (Objects.equals(Boolean.TRUE, isSubscribeMode) && !CommandType.isAllowedCommandInSubscribedMode(alias)) {
             return RESPUtils.getErrorMessageCommandInSubscribeMode(alias);

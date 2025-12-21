@@ -1,5 +1,7 @@
 package domain;
 
+import constants.OutputConstants;
+
 import java.net.Socket;
 
 public class ParserDto<T> {
@@ -7,6 +9,7 @@ public class ParserDto<T> {
     private Socket socket;
     private T value;
     private Boolean isNoProcessCommandHandler;
+    private String userName = OutputConstants.WHOAMI_USER_NAME_DEFAULT;
 
     public ParserDto(Socket socket, T value) {
         this(socket, value, null);
@@ -40,5 +43,13 @@ public class ParserDto<T> {
 
     public void setNoProcessCommandHandler(Boolean noProcessCommandHandler) {
         isNoProcessCommandHandler = noProcessCommandHandler;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
