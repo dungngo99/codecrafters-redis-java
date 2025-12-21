@@ -27,15 +27,6 @@ public class RESPParserUtils {
         Socket clientSocket = parserDto.getSocket();
         String userName = parserDto.getUserName();
 
-        AclConfigDto aclConfigDto = (AclConfigDto) RedisLocalMap.ACL_MAP.get(userName);
-        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
-        if (Objects.nonNull(aclConfigDto)
-                && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())
-                && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(clientSocketId)
-                && !AclHandler.isAclSetUserPassword(list)) {
-            return RESPUtils.toSimpleError(OutputConstants.ERROR_MESSAGE_NOAUTH_AUTHENTICATION);
-        }
-
         // pre-check
         if (list.isEmpty()) {
             return "";
@@ -43,6 +34,15 @@ public class RESPParserUtils {
 
         if (Objects.equals(parserDto.getNoProcessCommandHandler(), Boolean.TRUE)) {
             return String.join(OutputConstants.COMMA_DELIMITER, list);
+        }
+
+        AclConfigDto aclConfigDto = (AclConfigDto) RedisLocalMap.ACL_MAP.get(userName);
+        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
+        if (Objects.nonNull(aclConfigDto)
+                && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())
+                && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(clientSocketId)
+                && !AclHandler.isAclSetUserPassword(list)) {
+            return RESPUtils.toSimpleError(OutputConstants.ERROR_MESSAGE_NOAUTH_AUTHENTICATION);
         }
 
         String alias = list.get(0);

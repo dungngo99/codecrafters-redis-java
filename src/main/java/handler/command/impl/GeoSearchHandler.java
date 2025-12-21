@@ -95,7 +95,7 @@ public class GeoSearchHandler implements CommandHandler {
             logger.info("GeoSearchHandler: geoMemberWithinRangeList=" + geoMemberWithinRangeList);
             return RESPUtils.toArray(geoMemberWithinRangeList);
         } catch (Exception e) {
-            throw new RuntimeException(e.getCause());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
