@@ -37,10 +37,10 @@ public class RESPParserUtils {
         }
 
         AclConfigDto aclConfigDto = (AclConfigDto) RedisLocalMap.ACL_MAP.get(userName);
-        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
         if (Objects.nonNull(aclConfigDto)
                 && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())
-                && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(clientSocketId)
+                && Objects.nonNull(clientSocket)
+                && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(ServerUtils.formatIdFromSocket(clientSocket))
                 && !AclHandler.isAclSetUserPassword(list)) {
             return RESPUtils.toSimpleError(OutputConstants.ERROR_MESSAGE_NOAUTH_AUTHENTICATION);
         }
@@ -61,6 +61,7 @@ public class RESPParserUtils {
         }
 
         // check if commands are in subscribed mode
+        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
         Boolean isSubscribeMode = RedisLocalMap.SUBSCRIBE_MODE_SET.contains(clientSocketId);
         if (Objects.equals(Boolean.TRUE, isSubscribeMode) && !CommandType.isAllowedCommandInSubscribedMode(alias)) {
             return RESPUtils.getErrorMessageCommandInSubscribeMode(alias);
