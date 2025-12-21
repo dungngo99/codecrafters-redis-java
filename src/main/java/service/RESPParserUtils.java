@@ -7,6 +7,7 @@ import domain.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
 import handler.command.impl.AclHandler;
+import handler.command.impl.AuthHandler;
 import handler.command.impl.MultiHandler;
 import handler.job.JobHandler;
 import replication.MasterManager;
@@ -41,7 +42,8 @@ public class RESPParserUtils {
                 && StringUtils.isNotBlank(aclConfigDto.getPasswordHash())
                 && Objects.nonNull(clientSocket)
                 && !RedisLocalMap.AUTHENTICATED_CONNECTION_SET.contains(ServerUtils.formatIdFromSocket(clientSocket))
-                && !AclHandler.isAclSetUserPassword(list)) {
+                && !AclHandler.isAclSetUserPassword(list)
+                && !AuthHandler.isAuth(list)) {
             return RESPUtils.toSimpleError(OutputConstants.ERROR_MESSAGE_NOAUTH_AUTHENTICATION);
         }
 

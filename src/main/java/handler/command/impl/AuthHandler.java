@@ -3,19 +3,24 @@ package handler.command.impl;
 import domain.AclConfigDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
-import service.HashUtils;
-import service.RESPUtils;
-import service.RedisLocalMap;
-import service.StringUtils;
+import service.*;
 
 import java.net.Socket;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import static constants.OutputConstants.WHOAMI_USER_NAME_DEFAULT;
+
 public class AuthHandler implements CommandHandler {
     private static final Logger logger = Logger.getLogger(AuthHandler.class.getName());
     private static final String WRONGPASS_ERROR_MESSAGE = "WRONGPASS invalid username-password pair or user is disabled.";
+
+    public static boolean isAuth(List<String> args) {
+        return args.size() == 3
+                && CommandType.AUTH.getAlias().equalsIgnoreCase(args.get(0))
+                && WHOAMI_USER_NAME_DEFAULT.equalsIgnoreCase(args.get(1));
+    }
 
     @Override
     public void register() {
@@ -41,6 +46,9 @@ public class AuthHandler implements CommandHandler {
         if (!Objects.equals(inputHashPassword, cachedHashPassword)) {
             return RESPUtils.toSimpleError(WRONGPASS_ERROR_MESSAGE);
         }
+
+        String clientSocketId = ServerUtils.formatIdFromSocket(clientSocket);
+        RedisLocalMap.AUTHENTICATED_CONNECTION_SET.add(clientSocketId);
 
         return RESPUtils.getRESPOk();
     }

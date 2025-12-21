@@ -17,8 +17,8 @@ public class AclHandler implements CommandHandler {
     private static final Logger logger = Logger.getLogger(AclHandler.class.getName());
 
     public static boolean isAclSetUserPassword(List<String> args) {
-        return args.size() == 4 &&
-                CommandType.ACL.getAlias().equalsIgnoreCase(args.get(0))
+        return args.size() == 4
+                && CommandType.ACL.getAlias().equalsIgnoreCase(args.get(0))
                 && SET_USER_SUBCOMMAND.equalsIgnoreCase(args.get(1))
                 && WHOAMI_USER_NAME_DEFAULT.equalsIgnoreCase(args.get(2))
                 && args.get(3).startsWith(PASSWORDS_RULE);
