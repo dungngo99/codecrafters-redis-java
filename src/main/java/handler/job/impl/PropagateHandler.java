@@ -133,7 +133,6 @@ public class PropagateHandler implements JobHandler {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
         MasterNodeDto masterNode = MasterManager.getMasterNodeMap().get(masterNodeId);
         if (masterNode == null || masterNode.getMasterReplicaDtoList() == null) {
-            System.out.println("master node not found (non-master node should not call this method)");
             return false;
         }
         List<MasterReplicaDto> mrDtoList = masterNode.getMasterReplicaDtoList();
@@ -157,7 +156,6 @@ public class PropagateHandler implements JobHandler {
         String masterNodeId = SystemPropHelper.getSetMasterNodeId();
         MasterNodeDto masterNode = MasterManager.getMasterNodeMap().get(masterNodeId);
         if (masterNode == null || masterNode.getMasterReplicaDtoList() == null) {
-            System.out.println("master node not found (non-master node should not call this method)");
             return;
         }
         List<MasterReplicaDto> mrDtoList = masterNode.getMasterReplicaDtoList();
