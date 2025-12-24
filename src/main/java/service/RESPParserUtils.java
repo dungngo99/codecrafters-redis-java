@@ -6,9 +6,9 @@ import domain.JobDto;
 import domain.ParserDto;
 import enums.CommandType;
 import handler.command.CommandHandler;
-import handler.command.impl.AclHandler;
-import handler.command.impl.AuthHandler;
-import handler.command.impl.MultiHandler;
+import handler.command.impl.auth.AclHandler;
+import handler.command.impl.auth.AuthHandler;
+import handler.command.impl.transaction.MultiHandler;
 import handler.job.JobHandler;
 import replication.MasterManager;
 
