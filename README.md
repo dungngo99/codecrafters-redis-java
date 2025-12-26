@@ -75,45 +75,45 @@ This project is a Redis server implementation in **Java**, built from scratch as
 
    ```bash
    # send 1 command PING in 1 request
-   $ echo -e "PING" | redis-cli
+   $ redis-cli echo -e "PING" | redis-cli
    PONG
 
    # send multiple commands PING in 1 request
-   $ echo -e "PING\nPING" | redis-cli
+   $ redis-cli echo -e "PING\nPING" | redis-cli
    PONG
    PONG
 
    # send 1 command PING in 1 request and concurrently
-   $ echo -e "PING" | redis-cli; echo -e "PING" | redis-cli
+   $ redis-cli echo -e "PING" | redis-cli; echo -e "PING" | redis-cli
    PONG
    PONG
 
    # send 1 command ECHO in 1 request
-   $ echo -e "ECHO hey" | redis-cli
+   $ redis-cli echo -e "ECHO hey" | redis-cli
 
    # send 1 command SET in 1 request
    # then send 1 command GET in another request
-   $ echo -e "SET foo bar" | redis-cli
+   $ redis-cli echo -e "SET foo bar" | redis-cli
    OK
-   $ echo -e "GET foo" | redis-cli
+   $ redis-cli echo -e "GET foo" | redis-cli
    bar
-   $ echo -e "GET hello" | redis-cli
+   $ redis-cli echo -e "GET hello" | redis-cli
    (nil)
 
    # send 1 command SET in 1 request with expiry
    # then immediately send 1 command GET in another request
-   $ echo -e "SET foo bar PX 100" | redis-cli; echo -e "GET foo" | redis-cli
+   $ redis-cli echo -e "SET foo bar PX 100" | redis-cli; echo -e "GET foo" | redis-cli
    OK
    "bar"
 
    # send 1 command SET in 1 request with expiry
    # then sleep for 0.2 sec then send 1 command GET in another request
-   $ echo -e "SET foo bar PX 100" | redis-cli; sleep 0.2; echo -e "GET foo" | redis-cli
+   $ redis-cli echo -e "SET foo bar PX 100" | redis-cli; sleep 0.2; echo -e "GET foo" | redis-cli
    OK
    (nil)
 
    # send 1 command INFO in 1 request to a Master node about its replication setup
-   $ echo -e "info replication" | redis-cli
+   $ redis-cli echo -e "info replication" | redis-cli
    role:master
    master_replid:qk7ah4jae1nyyyq979mbsgbta09rierunnq74158
    master_repl_offset:0%
@@ -286,7 +286,7 @@ Redis replication is the foundation for high availability and failover.
 
 1. A **Master node** handles both read and write requests, while **Replica nodes** serve read-only requests.
 
-2. When clients send writes to the Master, it propagates the changes to all connected Replicas as a stream of bytes.
+2. When clients send write requests to the Master, it propagates the changes to all connected Replicas as a stream of bytes.
 
 There are two main aspects of replication:
 
